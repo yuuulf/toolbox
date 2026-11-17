@@ -21,8 +21,8 @@
 ## 4. 最終確認
 
 - [x] 4.1 `npm run lint` / `npm run format:check` / `npm test` / `npm run build` と actionlint がすべて成功することを確認する
-- [ ] 4.2 ユーザーの確認を取ってから、ローカルの main を push し、作業ブランチ `add-ci-workflows` で PR を作り、`gh label create archive` でラベルを作成する。PR で CI が実行されて成功することを `gh pr checks` で確認
-- [ ] 4.3 タスクが未完了の状態でその PR に `archive` ラベルを付け、アーカイブが拒否されて理由のコメントが付くこと、ラベルが外れること、ブランチにコミットが追加されないことを `gh pr view` と `git ls-remote` で確認
+- [x] 4.2 ユーザーの確認を取ってから、ローカルの main を push し、作業ブランチ `add-ci-workflows` で PR を作り、`gh label create archive` でラベルを作成する。PR で CI が実行されて成功することを `gh pr checks` で確認
+- [x] 4.3 タスクが未完了の状態でその PR に `archive` ラベルを付け、アーカイブが拒否されて理由のコメントが付くこと、ラベルが外れること、ブランチにコミットが追加されないことを `gh pr view` と `git ls-remote` で確認
 
 ## Workflow follow-up
 
