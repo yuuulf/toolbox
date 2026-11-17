@@ -9,7 +9,6 @@ permissions:
   contents: write # PR のブランチへの push
   pull-requests: write # PR へのコメント
   issues: write # ラベルの削除
-  actions: write # アーカイブのコミットに対する CI の起動（workflow_dispatch）
 
 # アーカイブの途中で止めると中途半端なコミットが残りうるため、取り消さずに順番に実行する
 concurrency:
@@ -155,25 +154,15 @@ jobs:
             exit 1
           fi
 
-      # GITHUB_TOKEN による push では pull_request の CI が走らず、main の必須チェック（verify）が付かない。
-      # workflow_dispatch は GITHUB_TOKEN からでも起動できるため、ここで CI を起動する。
-      # アーカイブ自体は完了しているので、起動に失敗してもジョブは失敗させず、コメントで回復方法を案内する
-      - name: CI の起動
-        id: dispatch
-        run: |
-          if gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$HEAD_REF"; then
-            echo 'started=true' >> "$GITHUB_OUTPUT"
-          else
-            echo '::warning::アーカイブのコミットに対して CI を起動できませんでした'
-            echo 'started=false' >> "$GITHUB_OUTPUT"
-          fi
-
+      # このワークフローの push で起動する pull_request の CI は承認待ち（action_required）になり、
+      # 承認するまで main の必須チェック（verify）が付かない。workflow_dispatch で起動した CI は
+      # PR のチェックに数えられないため、ここでは起動せず、承認の手順をコメントで案内する
       - name: 成功のコメント
         if: success()
         env:
           CHANGE: ${{ steps.change.outputs.name }}
           DEST: ${{ steps.archive.outputs.dest }}
-          CI_STARTED: ${{ steps.dispatch.outputs.started }}
+          CHECKS_URL: ${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}/checks
         run: |
           # shellcheck disable=SC2016 # バッククォートは Markdown のコード表記で、展開させない
           specs=$(grep -oE '^Applying changes to [^:]+' "$RUNNER_TEMP/archive.log" | sed -E 's/^Applying changes to (.*)$/- `\1`/' || true)
@@ -183,11 +172,12 @@ jobs:
             echo
             echo "\`$CHANGE\` をアーカイブし、\`openspec/changes/archive/$DEST/\` へ移動するコミットをこの PR に追加しました。"
             echo
-            if [ "$CI_STARTED" = 'true' ]; then
-              echo 'アーカイブのコミットに対して CI（`verify`）を起動しました。'
-            else
-              echo '**注意**: アーカイブのコミットに対して CI を起動できませんでした。main へのマージには `verify` の成功が必要なので、PR を閉じて開き直して CI を走らせてください。'
-            fi
+            echo '**マージの前に**: アーカイブのコミットに対する CI（`verify`）は承認待ちになります。main へのマージには `verify` の成功が必要なので、次の手順で CI を走らせてください。'
+            echo
+            echo "1. [Checks]($CHECKS_URL) か Actions で、承認待ちの CI の **Approve and run** を押す"
+            echo '2. `verify` が成功したらマージする'
+            echo
+            echo '承認の画面が出ない場合は、PR を閉じて開き直すと CI が走ります。'
             echo
             echo '同期した spec:'
             echo
