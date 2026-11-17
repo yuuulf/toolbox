@@ -1,0 +1,221 @@
+name: OpenSpec アーカイブ
+
+on:
+  pull_request:
+    types: [labeled]
+
+# pull_request_target は PR のコードを書き込み権限付きで動かすことになるため使わない
+permissions:
+  contents: write # PR のブランチへの push
+  pull-requests: write # PR へのコメント
+  issues: write # ラベルの削除
+
+# アーカイブの途中で止めると中途半端なコミットが残りうるため、取り消さずに順番に実行する
+concurrency:
+  group: openspec-archive-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  archive:
+    if: github.event.label.name == 'archive'
+    runs-on: ubuntu-latest
+    # PR 作成者が決められる値（ブランチ名など）は run: に直接埋め込まず、環境変数で受け取る
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_STATE: ${{ github.event.pull_request.state }}
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      GH_TOKEN: ${{ github.token }}
+      OPENSPEC_TELEMETRY: '0'
+      OPENSPEC_NO_UPDATE_CHECK: '1'
+      # PR コメントに出力を載せるため、色の制御文字を出さない
+      NO_COLOR: '1'
+    steps:
+      - name: 前提の確認
+        id: precheck
+        run: |
+          # fork の PR ではトークンが読み取り専用になり、push もコメントもできない
+          if [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then
+            echo "fork（${HEAD_REPO}）からの PR はブランチに push できないため、アーカイブできません。" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::fork からの PR はアーカイブできません"
+            exit 1
+          fi
+          # マージ・クローズ後はブランチが消えていることがあり、push すると作り直してしまう
+          if [ "$PR_STATE" != 'open' ]; then
+            echo "PR が open ではない（${PR_STATE}）ため、アーカイブできません。" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::PR が open ではありません"
+            exit 1
+          fi
+
+      - name: チェックアウト
+        id: checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Node のセットアップ
+        id: node
+        uses: jdx/mise-action@v5
+
+      # ローカル（Homebrew）と同じ版に固定する。更新するときはローカルとそろえて同じ変更で上げる
+      - name: OpenSpec CLI のインストール
+        id: install
+        run: npm install -g @fission-ai/openspec@1.15.0
+
+      - name: 対象 change の特定
+        id: change
+        run: |
+          # PR が変更した openspec/changes/<name>/ のうち、アーカイブ済みでなく今も残っているもの
+          names=$(git diff --name-only "$BASE_SHA...HEAD" -- openspec/changes/ |
+            awk -F/ 'NF >= 4 && $3 != "archive" { print $3 }' | sort -u)
+          found=()
+          for name in $names; do
+            if [ -d "openspec/changes/$name" ]; then found+=("$name"); fi
+          done
+          if [ "${#found[@]}" -ne 1 ]; then
+            echo "アーカイブする change を1つに特定できません（候補: ${found[*]:-なし}）。1つの PR では1つの change だけを変更してください。" > "$RUNNER_TEMP/reason.md"
+            cat "$RUNNER_TEMP/reason.md"
+            exit 1
+          fi
+          echo "対象: ${found[0]}"
+          echo "name=${found[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: 未完了タスクの確認
+        id: tasks
+        env:
+          CHANGE: ${{ steps.change.outputs.name }}
+        run: |
+          # openspec archive -y は未完了タスクがあっても警告だけで進むため、ここで止める
+          read -r status completed total < <(openspec list --json |
+            jq -r --arg name "$CHANGE" '.changes[] | select(.name == $name) | "\(.status) \(.completedTasks) \(.totalTasks)"')
+          echo "タスク: $completed/${total}（${status}）"
+          if [ "$status" != 'complete' ]; then
+            echo "\`$CHANGE\` に未完了のタスクがあります（$completed/$total 完了）。すべて完了してからアーカイブしてください。" > "$RUNNER_TEMP/reason.md"
+            exit 1
+          fi
+
+      - name: change の検証
+        id: validate
+        env:
+          CHANGE: ${{ steps.change.outputs.name }}
+        run: openspec validate "$CHANGE" --strict
+
+      # ローカルの「変更を完了とする前に」と同じ lint / format:check / test / build
+      - name: lint / format:check / test / build
+        id: verify
+        uses: ./.github/actions/verify
+
+      - name: アーカイブ
+        id: archive
+        env:
+          CHANGE: ${{ steps.change.outputs.name }}
+        run: |
+          openspec archive "$CHANGE" -y | tee "$RUNNER_TEMP/archive.log"
+          if [ -d "openspec/changes/$CHANGE" ]; then
+            echo "openspec archive は終了しましたが、\`openspec/changes/$CHANGE\` が残っています。" > "$RUNNER_TEMP/reason.md"
+            exit 1
+          fi
+          dest=$(grep -oE "archived as '[^']+'" "$RUNNER_TEMP/archive.log" | sed -E "s/archived as '(.*)'/\1/")
+          echo "dest=$dest" >> "$GITHUB_OUTPUT"
+
+      - name: 差分が openspec/ の中だけであることの確認
+        id: diff
+        run: |
+          git add -A
+          # 検証済みのツリーに加わるのが lint・テスト・ビルドの対象外（openspec/）だけであることを保証する
+          outside=$(git diff --cached --name-only | grep -v '^openspec/' || true)
+          if [ -n "$outside" ]; then
+            {
+              echo 'アーカイブで openspec/ の外のファイルが変更されたため、コミットしませんでした。'
+              echo
+              awk '{ print "- " $0 }' <<< "$outside"
+            } > "$RUNNER_TEMP/reason.md"
+            cat "$RUNNER_TEMP/reason.md"
+            exit 1
+          fi
+
+      - name: コミットと push
+        id: push
+        env:
+          CHANGE: ${{ steps.change.outputs.name }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "$CHANGE をアーカイブ"
+          # ラベルを付けた後にブランチが進んでいたら non-fast-forward で拒否される（古い内容で上書きしない）
+          if ! git push origin "HEAD:refs/heads/$HEAD_REF"; then
+            echo 'PR のブランチに push できませんでした。ラベルを付けた後にブランチが更新された可能性があります。最新の状態で、もう一度ラベルを付けてください。' > "$RUNNER_TEMP/reason.md"
+            exit 1
+          fi
+
+      - name: 成功のコメント
+        if: success()
+        env:
+          CHANGE: ${{ steps.change.outputs.name }}
+          DEST: ${{ steps.archive.outputs.dest }}
+        run: |
+          # shellcheck disable=SC2016 # バッククォートは Markdown のコード表記で、展開させない
+          specs=$(grep -oE '^Applying changes to [^:]+' "$RUNNER_TEMP/archive.log" | sed -E 's/^Applying changes to (.*)$/- `\1`/' || true)
+          {
+            echo '### OpenSpec のアーカイブが完了しました'
+            echo
+            echo "\`$CHANGE\` をアーカイブし、\`openspec/changes/archive/$DEST/\` へ移動するコミットをこの PR に追加しました。"
+            echo
+            echo '同期した spec:'
+            echo
+            echo "${specs:-- なし（spec の変更を含まない change）}"
+            echo
+            echo '<details><summary>openspec archive の出力</summary>'
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/archive.log"
+            echo '```'
+            echo
+            echo '</details>'
+          } > "$RUNNER_TEMP/comment.md"
+          gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" -F "body=@$RUNNER_TEMP/comment.md" > /dev/null
+
+      # fork の PR ではコメントできないため、前提の確認が通ったときだけ
+      - name: 失敗のコメント
+        if: failure() && steps.precheck.outcome == 'success'
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          OUTCOMES: |
+            チェックアウト=${{ steps.checkout.outcome }}
+            Node のセットアップ=${{ steps.node.outcome }}
+            OpenSpec CLI のインストール=${{ steps.install.outcome }}
+            対象 change の特定=${{ steps.change.outcome }}
+            未完了タスクの確認=${{ steps.tasks.outcome }}
+            change の検証=${{ steps.validate.outcome }}
+            lint / format:check / test / build=${{ steps.verify.outcome }}
+            アーカイブ=${{ steps.archive.outcome }}
+            差分が openspec/ の中だけであることの確認=${{ steps.diff.outcome }}
+            コミットと push=${{ steps.push.outcome }}
+        run: |
+          failed=$(awk -F= '$2 == "failure" { print $1; exit }' <<< "$OUTCOMES")
+          {
+            echo '### OpenSpec のアーカイブは行いませんでした'
+            echo
+            echo "失敗したステップ: **${failed:-不明}**"
+            echo
+            if [ -f "$RUNNER_TEMP/reason.md" ]; then
+              cat "$RUNNER_TEMP/reason.md"
+              echo
+            fi
+            echo "詳細は[実行ログ]($RUN_URL)を確認してください。直したら、もう一度 \`archive\` ラベルを付けると再実行します。"
+          } > "$RUNNER_TEMP/comment.md"
+          gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" -F "body=@$RUNNER_TEMP/comment.md" > /dev/null
+
+      # 成否に関わらず外し、付け直せば再実行できるようにする
+      - name: archive ラベルを外す
+        if: always() && steps.precheck.outcome == 'success'
+        run: |
+          if ! gh api -X DELETE "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/labels/archive" > /dev/null; then
+            echo '::warning::archive ラベルを外せませんでした（すでに外されている可能性があります）'
+          fi

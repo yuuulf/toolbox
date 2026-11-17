@@ -41,6 +41,22 @@ http://localhost:3000 を開きます。mise をシェルで有効化してい�
 | `npm test`             | テストを実行（Vitest）                       |
 | `npm run test:watch`   | テストをウォッチモードで実行                 |
 
+## CI と OpenSpec のアーカイブ
+
+GitHub Actions で次の2つを自動化しています（`.github/workflows/`）。
+
+- **CI**：PR の作成・更新のたびに `npm run lint` / `npm run format:check` / `npm test` / `npm run build` を実行します。
+- **アーカイブ**：PR に `archive` ラベルを付けると、その PR が変更している OpenSpec の change をアーカイブします。spec への反映と `openspec/changes/archive/` への移動をコミットとして PR に追加し、結果を PR にコメントします。ラベルは成否に関わらず外れるので、付け直せば再実行します。
+
+アーカイブするには次の条件を満たす必要があります。満たさない場合はアーカイブせず、理由をコメントします。
+
+- `tasks.md` のタスクがすべて完了している
+- PR が変更している change が1つだけ（1つの PR では1つの change を扱う）
+- `openspec validate --strict` と、CI と同じ4つのコマンドが通る
+- fork からの PR ではない（fork のブランチには push できないため）
+
+spec と実装が合っているかは自動では確かめないので、ラベルを付ける前にレビューで確認してください。
+
 ## ツールの追加手順
 
 1. `lib/tools/<name>.ts` にロジックを書き、同じ場所に `<name>.test.ts` でテストを書く
