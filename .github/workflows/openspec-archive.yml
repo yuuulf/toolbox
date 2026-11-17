@@ -9,6 +9,7 @@ permissions:
   contents: write # PR のブランチへの push
   pull-requests: write # PR へのコメント
   issues: write # ラベルの削除
+  actions: write # アーカイブのコミットに対する CI の起動（workflow_dispatch）
 
 # アーカイブの途中で止めると中途半端なコミットが残りうるため、取り消さずに順番に実行する
 concurrency:
@@ -154,18 +155,39 @@ jobs:
             exit 1
           fi
 
+      # GITHUB_TOKEN による push では pull_request の CI が走らず、main の必須チェック（verify）が付かない。
+      # workflow_dispatch は GITHUB_TOKEN からでも起動できるため、ここで CI を起動する。
+      # アーカイブ自体は完了しているので、起動に失敗してもジョブは失敗させず、コメントで回復方法を案内する
+      - name: CI の起動
+        id: dispatch
+        run: |
+          if gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$HEAD_REF"; then
+            echo 'started=true' >> "$GITHUB_OUTPUT"
+          else
+            echo '::warning::アーカイブのコミットに対して CI を起動できませんでした'
+            echo 'started=false' >> "$GITHUB_OUTPUT"
+          fi
+
       - name: 成功のコメント
         if: success()
         env:
           CHANGE: ${{ steps.change.outputs.name }}
           DEST: ${{ steps.archive.outputs.dest }}
+          CI_STARTED: ${{ steps.dispatch.outputs.started }}
         run: |
           # shellcheck disable=SC2016 # バッククォートは Markdown のコード表記で、展開させない
           specs=$(grep -oE '^Applying changes to [^:]+' "$RUNNER_TEMP/archive.log" | sed -E 's/^Applying changes to (.*)$/- `\1`/' || true)
+          # shellcheck disable=SC2016 # 同上
           {
             echo '### OpenSpec のアーカイブが完了しました'
             echo
             echo "\`$CHANGE\` をアーカイブし、\`openspec/changes/archive/$DEST/\` へ移動するコミットをこの PR に追加しました。"
+            echo
+            if [ "$CI_STARTED" = 'true' ]; then
+              echo 'アーカイブのコミットに対して CI（`verify`）を起動しました。'
+            else
+              echo '**注意**: アーカイブのコミットに対して CI を起動できませんでした。main へのマージには `verify` の成功が必要なので、PR を閉じて開き直して CI を走らせてください。'
+            fi
             echo
             echo '同期した spec:'
             echo
