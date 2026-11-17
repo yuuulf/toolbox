@@ -1,0 +1,43 @@
+schema: spec-driven
+
+context: |
+  便利ツールをまとめたWebアプリ（toolbox）。
+  技術スタック: Next.js（App Router, TypeScript）、Tailwind CSS、パッケージマネージャは npm。
+  データ方針: サーバー側にユーザーデータを保存しない。永続化が必要な場合は localStorage のみ使用し、
+  それ以外のDB・外部ストレージ・外部APIへの送信は行わない。各ツールの処理はブラウザ内で完結させる。
+  localStorage はアクセス失敗（プライベートモード等）時も動作が壊れないようにすること。
+  アーティファクトは日本語で記述する（コード・識別子・コマンドは英語のまま）。
+
+rules:
+  proposal:
+    - スコープ外（Out of scope）を明記する
+    - データ保存の有無（なし / localStorage）をツールごとに明記する
+  specs:
+    - "ツールごとに capability を分ける（例: tool-json-formatter）"
+  design:
+    - 新しいツールを追加するときの登録手順（ツールレジストリへの追加）を崩さない
+  tasks:
+    - 各タスクは2時間以内の粒度に分割する
+    - ロジックやUIを実装するタスクには対応するテストの追加を含め、npm test の成功を完了条件にする
+    - 最終グループに npm run lint / npm run format:check / npm test / npm run build をまとめて確認するタスクを含める
+
+operations:
+  apply:
+    guidance:
+      # 進め方
+      - タスクにない機能を追加しない
+      - 実装中に spec と食い違う点が見つかったら、コードで勝手に解決せず計画（spec / design）の更新を提案する
+      - 開発環境・コードスタイル・コミット規約は AGENTS.md に従う（Node は mise 経由で実行する）
+      # 検証
+      - 各タスクの完了前に npm test を実行し、失敗したままチェックを付けない
+      - グループの終わりに npm run lint を実行し、エラーを解消してから次のグループへ進む
+      # 報告
+      - テスト結果は簡潔に報告し、失敗時のみ詳細を示す
+  archive:
+    guidance:
+      # アーカイブ前の確認（満たさなければアーカイブせず、残りを明示して止まる）
+      - npm run lint / npm run format:check / npm test / npm run build がすべて成功することを確認する
+      - tasks.md に未完了のタスクがないことを確認する
+      - 仕様（spec）と実装が整合していることを確認する
+      # 完了時
+      - アーカイブ結果（同期された spec）を要約し、追加で適用が必要なことがあれば明示する
