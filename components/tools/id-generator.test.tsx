@@ -56,11 +56,18 @@ describe('UUID', () => {
     }
   })
 
-  it('生成した UUID をすべてコピーできる', async () => {
+  it('生成した UUID をすべて改行区切りでコピーできる', async () => {
     const { user } = await setup()
+    const count = screen.getByLabelText('個数')
+    await user.clear(count)
+    await user.type(count, '3')
     await user.click(screen.getByRole('button', { name: 'UUID を生成' }))
     await user.click(screen.getByRole('button', { name: 'UUID をコピー' }))
-    expect(await navigator.clipboard.readText()).toMatch(UUID_V4)
+
+    const lines = (await navigator.clipboard.readText()).split('\n')
+    expect(lines).toHaveLength(3)
+    for (const line of lines) expect(line).toMatch(UUID_V4)
+    expect(screen.getByText('コピーしました')).toBeInTheDocument()
   })
 })
 
