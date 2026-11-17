@@ -74,6 +74,7 @@ push まで済んでいれば、アーカイブ自体は完了している。dis
 - `bypass_actors: []` で管理者も例外にしない
 - `integration_id` を GitHub Actions に固定し、ほかのアプリやコミットステータスで `verify` を名乗れないようにする
 - `strict_required_status_checks_policy: false`: main が進むたびに PR のブランチを更新させない（範囲外）
+- 作成すると、上の JSON に書いていない `pull_request` のパラメータが既定値で入る（`allowed_merge_methods: [merge, squash, rebase]`、`require_extra_approval_for_unattributed_changes: true` など）。後者は Copilot が人を介さずに開いた PR に承認を1つ追加するもので、必要承認数が 0 のときは効果がない（GitHub Docs「Available rules for rulesets」）ため、既定値のままにする
 - ruleset はリポジトリ設定でコードに残らないため、この design に定義を残す。変更するときは design と同じ内容を API で反映する
 
 ### 4. ruleset を作るタイミング

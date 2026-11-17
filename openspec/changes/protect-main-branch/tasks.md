@@ -14,8 +14,8 @@
 ## 3. 最終確認と ruleset
 
 - [x] 3.1 `npm run lint` / `npm run format:check` / `npm test` / `npm run build` と actionlint がすべて成功することを確認する
-- [ ] 3.2 ユーザーの確認を取ってから、作業ブランチ `protect-main-branch` を push して PR を作り、CI が成功することを `gh pr checks` で確認
-- [ ] 3.3 ユーザーの確認を取ってから、design.md 決定3の定義で main の ruleset を作成する。`gh api repos/yuuulf/toolbox/rules/branches/main` で deletion / non_fast_forward / pull_request / required_status_checks（`verify`）が有効なこと、ruleset の `bypass_actors` が空であることを確認
+- [x] 3.2 ユーザーの確認を取ってから、作業ブランチ `protect-main-branch` を push して PR を作り、CI が成功することを `gh pr checks` で確認
+- [x] 3.3 ユーザーの確認を取ってから、design.md 決定3の定義で main の ruleset を作成する。`gh api repos/yuuulf/toolbox/rules/branches/main` で deletion / non_fast_forward / pull_request / required_status_checks（`verify`）が有効なこと、ruleset の `bypass_actors` が空であることを確認
 
 ## Workflow follow-up
 
