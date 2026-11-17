@@ -14,7 +14,7 @@
 ## 3. 最終確認
 
 - [x] 3.1 `npm run lint` / `npm run format:check` / `npm test` / `npm run build` と actionlint がすべて成功することを確認する
-- [ ] 3.2 ユーザーの確認を取ってから、作業ブランチ `fix-archive-ci-approval` を push して PR を作り、CI（`verify`）が成功することを `gh pr checks` で確認
+- [x] 3.2 ユーザーの確認を取ってから、作業ブランチ `fix-archive-ci-approval` を push して PR を作り、CI（`verify`）が成功することを `gh pr checks` で確認
 
 ## Workflow follow-up
 
