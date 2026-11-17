@@ -11,9 +11,16 @@ const MESSAGES: Record<Exclude<Status, 'idle'>, string> = {
   failed: 'コピーできませんでした',
 }
 
+// 失敗は × の形でも区別できるので、色は補助として付ける
+const STATUS_COLORS: Record<Status, string> = {
+  idle: '',
+  copied: 'text-green-700 dark:text-green-400',
+  failed: 'text-red-700 dark:text-red-400',
+}
+
 type Props = {
   text: string
-  /** ボタンの文言。複数のコピーボタンを区別したいときに指定する */
+  /** ボタンのアクセシブルな名前とツールチップ。複数のコピーボタンを区別したいときに指定する */
   label?: string
 }
 
@@ -36,25 +43,52 @@ export function CopyButton({ text, label = 'コピー' }: Props) {
   }
 
   return (
-    <span className="inline-flex items-center gap-2">
+    <span className="inline-flex items-center">
       <button
         type="button"
         onClick={handleClick}
         disabled={text === ''}
-        className="rounded-md border border-zinc-300 px-3 py-1 text-sm hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+        aria-label={label}
+        title={label}
+        className={`rounded-md border border-zinc-300 p-2 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-800 ${STATUS_COLORS[status]}`}
       >
-        {label}
+        <StatusIcon status={status} />
       </button>
-      <span
-        aria-live="polite"
-        className={
-          status === 'failed'
-            ? 'text-sm text-red-700 dark:text-red-400'
-            : 'text-sm text-zinc-600 dark:text-zinc-400'
-        }
-      >
+      {/* 結果は画面に出さず、読み上げだけで伝える（見た目はアイコンの切り替えで示す） */}
+      <span aria-live="polite" className="sr-only">
         {status === 'idle' ? '' : MESSAGES[status]}
       </span>
     </span>
+  )
+}
+
+const ICON_PATHS: Record<Status, string> = {
+  idle: 'M8 8h11v13H8z M5 16H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v1',
+  copied: 'M5 12l5 5L20 7',
+  failed: 'M6 6l12 12 M18 6L6 18',
+}
+
+const ICON_NAMES: Record<Status, string> = {
+  idle: 'copy',
+  copied: 'check',
+  failed: 'x',
+}
+
+function StatusIcon({ status }: { status: Status }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      data-icon={ICON_NAMES[status]}
+      className="size-4"
+    >
+      <path d={ICON_PATHS[status]} />
+    </svg>
   )
 }
