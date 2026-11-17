@@ -1,0 +1,6 @@
+@import 'tailwindcss';
+
+/* フォーム部品やスクロールバーも OS のライト/ダーク設定に追従させる */
+:root {
+  color-scheme: light dark;
+}
