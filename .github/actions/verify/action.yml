@@ -1,0 +1,28 @@
+name: verify
+description: mise.toml の Node で依存を入れ、lint / format:check / test / build を実行する
+
+runs:
+  using: composite
+  steps:
+    # Node のバージョンは mise.toml を正とし、ここには書かない
+    - uses: jdx/mise-action@v5
+
+    - name: 依存のインストール
+      shell: bash
+      run: npm ci
+
+    - name: Lint
+      shell: bash
+      run: npm run lint
+
+    - name: フォーマットの確認
+      shell: bash
+      run: npm run format:check
+
+    - name: テスト
+      shell: bash
+      run: npm test
+
+    - name: ビルド
+      shell: bash
+      run: npm run build

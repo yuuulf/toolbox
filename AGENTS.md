@@ -56,6 +56,11 @@ lib/                      # React に依存しないロジック
     json-format.ts
 public/                   # 静的ファイル（必要になったら作る）
 proxy.ts                  # 未登録の /tools/<slug> に 404 を返す
+.github/
+  actions/verify/         # lint / format:check / test / build（CI とアーカイブで共通）
+  workflows/
+    ci.yml                # PR ごとに verify を実行
+    openspec-archive.yml  # archive ラベルで OpenSpec の change をアーカイブ
 ```
 
 ### Next.js の規約
@@ -131,6 +136,9 @@ proxy.ts                  # 未登録の /tools/<slug> に 404 を返す
 
 - 仕様と計画は OpenSpec（`openspec/`）で管理する。ルールは `openspec/config.yaml`
 - タスクにない機能を追加しない。仕様と食い違う点は、コードで決めず計画の更新を提案する
+- 1つの PR では1つの change だけを扱う（アーカイブのワークフローが対象を特定できなくなるため）
+- アーカイブは、レビューで spec と実装の整合を確認した後、PR に `archive` ラベルを付けて行う（`.github/workflows/openspec-archive.yml`）
+- ワークフローの OpenSpec CLI は、ローカルと同じ版に固定している（`openspec-archive.yml` の `@fission-ai/openspec@<版>`）。ローカルの CLI を更新するときは、同じ変更でこの版も上げる
 
 ## 変更を完了とする前に
 
