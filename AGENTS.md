@@ -154,5 +154,7 @@ proxy.ts                  # 未登録の /tools/<slug> に 404 を返す
 ## コミット
 
 - コミットメッセージは短い日本語で書く（例: `文字数カウントツールを追加`）
+- main へ直接 push しない。作業ブランチを切って PR を作る（main は ruleset で PR 必須・CI（`verify`）必須になっており、管理者も例外にしていない）
+- CI 自体が壊れてどの PR もマージできなくなったときは、リポジトリ設定の ruleset（`main`）を一時的に無効化して修正をマージし、すぐに元へ戻す。ruleset の定義は `openspec/changes/archive/*-protect-main-branch/design.md` にある
 - 1コミット1目的。フォーマットだけの変更は機能変更と分ける
 - README・AGENTS.md の更新は、それを必要にしたコード変更と同じコミットに含める

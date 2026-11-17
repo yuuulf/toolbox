@@ -2,13 +2,15 @@ name: CI
 
 on:
   pull_request:
+  # アーカイブのワークフローが積んだコミットには pull_request の CI が走らないため、そこから起動する
+  workflow_dispatch:
 
 permissions:
   contents: read
 
-# 同じ PR に新しいコミットが積まれたら、古い実行は取り消す
+# 同じ PR（dispatch ではブランチ）に新しいコミットが積まれたら、古い実行は取り消す
 concurrency:
-  group: ci-${{ github.event.pull_request.number }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:

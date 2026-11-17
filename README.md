@@ -46,7 +46,9 @@ http://localhost:3000 を開きます。mise をシェルで有効化してい�
 GitHub Actions で次の2つを自動化しています（`.github/workflows/`）。
 
 - **CI**：PR の作成・更新のたびに `npm run lint` / `npm run format:check` / `npm test` / `npm run build` を実行します。
-- **アーカイブ**：PR に `archive` ラベルを付けると、その PR が変更している OpenSpec の change をアーカイブします。spec への反映と `openspec/changes/archive/` への移動をコミットとして PR に追加し、結果を PR にコメントします。ラベルは成否に関わらず外れるので、付け直せば再実行します。
+- **アーカイブ**：PR に `archive` ラベルを付けると、その PR が変更している OpenSpec の change をアーカイブします。spec への反映と `openspec/changes/archive/` への移動をコミットとして PR に追加し、結果を PR にコメントします。ラベルは成否に関わらず外れるので、付け直せば再実行します。アーカイブのコミットには CI を自動で起動します。
+
+main は保護されていて、PR を通し、CI（`verify`）が成功したときだけマージできます（直接 push・force push・削除は不可。管理者も同じ）。アーカイブ後の CI を起動できなかったと PR にコメントされた場合は、PR を閉じて開き直すと CI が走ります。
 
 アーカイブするには次の条件を満たす必要があります。満たさない場合はアーカイブせず、理由をコメントします。
 
