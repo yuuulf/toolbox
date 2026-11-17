@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-  # アーカイブのワークフローが積んだコミットには pull_request の CI が走らないため、そこから起動する
+  # 手動で再実行するため。dispatch の実行は PR のチェックに数えられず、main の必須チェック（verify）は満たさない
   workflow_dispatch:
 
 permissions:

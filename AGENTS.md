@@ -138,7 +138,7 @@ proxy.ts                  # 未登録の /tools/<slug> に 404 を返す
 - 仕様と計画は OpenSpec（`openspec/`）で管理する。ルールは `openspec/config.yaml`
 - タスクにない機能を追加しない。仕様と食い違う点は、コードで決めず計画の更新を提案する
 - 1つの PR では1つの change だけを扱う（アーカイブのワークフローが対象を特定できなくなるため）
-- アーカイブは、レビューで spec と実装の整合を確認した後、PR に `archive` ラベルを付けて行う（`.github/workflows/openspec-archive.yml`）
+- アーカイブは、レビューで spec と実装の整合を確認した後、PR に `archive` ラベルを付けて行う（`.github/workflows/openspec-archive.yml`）。アーカイブのコミットに対する CI は承認待ちになるので、Approve and run で承認し、`verify` の成功を確認してからマージする（出ないときは PR を閉じて開き直す）
 - ワークフローの OpenSpec CLI は、ローカルと同じ版に固定している（`openspec-archive.yml` の `@fission-ai/openspec@<版>`）。ローカルの CLI を更新するときは、同じ変更でこの版も上げる
 
 ## 変更を完了とする前に
