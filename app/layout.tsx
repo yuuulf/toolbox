@@ -21,8 +21,8 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html lang="ja" className="h-full antialiased">
       <body className="flex min-h-full flex-col bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
         <Header />
-        {/* 未登録 slug のように実行時まで URL が決まらないページでは usePathname が中断するため、
-            現在地の強調なしのナビをフォールバックにする */}
+        {/* static export ではビルド時に URL が決まるため usePathname は中断しないが、
+            サーバーで描画する構成に戻したときに備えて、現在地の強調なしのナビをフォールバックに残す */}
         <Suspense fallback={<ToolNavList items={navItems} />}>
           <ToolNav items={navItems} />
         </Suspense>

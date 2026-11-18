@@ -18,7 +18,7 @@
 - **THEN** `/tools/char-counter` に遷移し、文字数カウントツールが表示される
 
 ### Requirement: ツールごとのページ
-システムは各ツールを `/tools/<slug>` で表示しなければならない（SHALL）。登録されていない slug へのアクセスには 404 ページを返さなければならない。
+システムは各ツールを `/tools/<slug>` で表示しなければならない（SHALL）。登録されていない slug へのアクセスには 404 ページを返さなければならない。この仕様に書くパス（`/` や `/tools/<slug>`）は、公開先のベースパス `/toolbox` からの相対パスとする（公開版では `https://yuuulf.github.io/toolbox/tools/<slug>`、開発サーバーでは `http://localhost:3000/toolbox/tools/<slug>`）。
 
 #### Scenario: 登録済みツールのページ
 - **WHEN** ユーザーが `/tools/json-formatter` を開く
@@ -27,6 +27,10 @@
 #### Scenario: 未登録の slug
 - **WHEN** ユーザーが `/tools/does-not-exist` を開く
 - **THEN** 404 ページが表示される
+
+#### Scenario: ベースパスの下で動く
+- **WHEN** ユーザーが公開版のトップページ `https://yuuulf.github.io/toolbox/` から一覧・ナビゲーション・ヘッダーのリンクをたどる
+- **THEN** すべてのリンク先と、ページが読み込むスクリプト・スタイル・アイコンが `/toolbox` の下にあり、どれも 404 にならない
 
 ### Requirement: 共通ヘッダーとツール間ナビゲーション
 システムはすべてのページに、トップページへ戻るリンクを含むヘッダーと、登録済みツールへのナビゲーションを表示しなければならない（SHALL）。現在表示中のツールはナビゲーション上で区別できなければならない。
