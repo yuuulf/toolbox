@@ -23,12 +23,17 @@ export function JsonFormatter() {
 
   const output = result?.ok ? result.output : ''
 
+  // 広い画面では入力（と操作）を左、出力を右に並べ、1画面に収める。
+  // DOM の順序（入力 → 操作 → 出力）は変えず、Tab の順を保つ
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <label htmlFor={inputId} className="text-sm font-medium">
-          入力
-        </label>
+    <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
+      <div className="flex flex-col gap-1 lg:col-start-1">
+        {/* 出力欄の見出し行（コピーボタンあり）と高さをそろえ、2列のとき欄の上端を合わせる */}
+        <div className="flex min-h-9 items-center">
+          <label htmlFor={inputId} className="text-sm font-medium">
+            入力
+          </label>
+        </div>
         <textarea
           id={inputId}
           value={input}
@@ -39,7 +44,7 @@ export function JsonFormatter() {
         />
       </div>
 
-      <div className="flex flex-wrap items-end gap-3">
+      <div className="flex flex-wrap items-end gap-3 lg:col-start-1">
         <div className="flex flex-col gap-1">
           <label htmlFor={indentId} className="text-sm font-medium">
             インデント
@@ -78,12 +83,12 @@ export function JsonFormatter() {
         </button>
       </div>
 
-      <div aria-live="polite">
+      <div aria-live="polite" className="lg:col-start-1">
         <ResultMessage result={result} />
       </div>
 
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-1 lg:col-start-2 lg:row-span-3 lg:row-start-1">
+        <div className="flex min-h-9 items-center justify-between gap-2">
           <label htmlFor={outputId} className="text-sm font-medium">
             出力
           </label>

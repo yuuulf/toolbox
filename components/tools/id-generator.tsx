@@ -29,8 +29,11 @@ const inputClass =
 const errorText = 'text-sm text-red-700 dark:text-red-400'
 
 export function IdGenerator() {
+  // 広い画面では2つのセクションを左右に並べ、1画面に収める。
+  // 各セクションを4行（見出し・入力欄とボタン・補足・結果欄）の subgrid にして、左右で行の高さを共有し、
+  // 入力欄・ボタン・結果欄の位置をそろえる
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-10 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-3">
       <UuidSection />
       <PasswordSection />
     </div>
@@ -58,7 +61,7 @@ function UuidSection() {
   const output = uuids.join('\n')
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-3 lg:row-span-4 lg:grid lg:grid-rows-subgrid">
       <h2 className="text-lg font-semibold">UUID v4</h2>
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1">
@@ -190,41 +193,25 @@ function PasswordSection() {
   ].filter(Boolean)
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-3 lg:row-span-4 lg:grid lg:grid-rows-subgrid">
       <h2 className="text-lg font-semibold">パスワード</h2>
-      <div className="flex flex-col gap-1">
-        <label htmlFor={lengthId} className="text-sm font-medium">
-          長さ
-        </label>
-        <input
-          id={lengthId}
-          type="number"
-          inputMode="numeric"
-          min={PASSWORD_LENGTH_MIN}
-          max={PASSWORD_LENGTH_MAX}
-          value={lengthText}
-          onChange={(e) => handleLengthChange(e.target.value)}
-          className={inputClass}
-        />
-      </div>
-      <fieldset className="flex flex-col gap-1">
-        <legend className="text-sm font-medium">文字種</legend>
-        <div className="flex flex-wrap gap-x-4 gap-y-1">
-          {CHARSET_LABELS.map(({ key, label }) => (
-            <label key={key} className="flex items-center gap-1 text-sm">
-              <input
-                type="checkbox"
-                checked={options[key]}
-                onChange={(e) =>
-                  updateOptions({ ...options, [key]: e.target.checked })
-                }
-              />
-              {label}
-            </label>
-          ))}
+      {/* UUID と同じく、入力欄の横に生成ボタンを置く */}
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="flex flex-col gap-1">
+          <label htmlFor={lengthId} className="text-sm font-medium">
+            長さ
+          </label>
+          <input
+            id={lengthId}
+            type="number"
+            inputMode="numeric"
+            min={PASSWORD_LENGTH_MIN}
+            max={PASSWORD_LENGTH_MAX}
+            value={lengthText}
+            onChange={(e) => handleLengthChange(e.target.value)}
+            className={inputClass}
+          />
         </div>
-      </fieldset>
-      <div>
         <button
           type="button"
           onClick={handleGenerate}
@@ -234,10 +221,29 @@ function PasswordSection() {
           パスワードを生成
         </button>
       </div>
-      <div aria-live="polite" className={errorText}>
-        {messages.map((message) => (
-          <p key={message}>{message}</p>
-        ))}
+      <div className="flex flex-col gap-3">
+        <fieldset className="flex flex-col gap-1">
+          <legend className="text-sm font-medium">文字種</legend>
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            {CHARSET_LABELS.map(({ key, label }) => (
+              <label key={key} className="flex items-center gap-1 text-sm">
+                <input
+                  type="checkbox"
+                  checked={options[key]}
+                  onChange={(e) =>
+                    updateOptions({ ...options, [key]: e.target.checked })
+                  }
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <div aria-live="polite" className={errorText}>
+          {messages.map((message) => (
+            <p key={message}>{message}</p>
+          ))}
+        </div>
       </div>
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-2">

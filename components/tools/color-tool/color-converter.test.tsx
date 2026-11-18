@@ -25,6 +25,7 @@ function Controlled({
       isFavorite={isFavorite}
       canAddFavorite={canAddFavorite}
       onToggleFavorite={onToggleFavorite}
+      favoritesCountId="count"
     />
   )
 }
@@ -57,14 +58,25 @@ describe('ColorConverter の変換', () => {
     expect(valueOf('RGB')).toBe('rgb(0, 128, 0)')
   })
 
-  it('空入力では表示が空で、入力を促す案内を出す（エラー扱いしない）', () => {
+  it('空入力では表示が空で、入力を促す案内をプレビューの枠の中に出す（エラー扱いしない）', () => {
     render(<Controlled />)
     expect(valueOf('HEX')).toBe('')
     expect(screen.queryByRole('img')).not.toBeInTheDocument()
-    expect(
-      screen.getByText('HEX・RGB・HSL のどれかで色を入力してください。'),
-    ).toBeInTheDocument()
+    const guide = screen.getByText(
+      'HEX・RGB・HSL のどれかで色を入力してください。',
+    )
+    // 案内専用の行ではなく、プレビューの位置（星ボタンと同じ行）に出す
+    expect(guide.parentElement).toContainElement(favoriteButton())
     expect(screen.queryByText(/エラー/)).not.toBeInTheDocument()
+  })
+
+  it('色を入れると入力を促す案内は消える', async () => {
+    const user = userEvent.setup()
+    render(<Controlled />)
+    await user.type(screen.getByLabelText('色'), '#336699')
+    expect(
+      screen.queryByText('HEX・RGB・HSL のどれかで色を入力してください。'),
+    ).not.toBeInTheDocument()
   })
 
   it('解釈できない入力では、入力中は表示とプレビューを空にしてエラーは出さない', async () => {
@@ -156,19 +168,26 @@ describe('ColorConverter のお気に入りボタン', () => {
     expect(favoriteButton()).toBeDisabled()
   })
 
-  it('上限で未登録の色のときは押せず、理由を表示する', () => {
-    render(<Controlled initial="#ff0000" canAddFavorite={false} />)
+  it('上限で未登録の色のときは押せず、お気に入りの件数を説明として結びつける', () => {
+    render(
+      <>
+        <Controlled initial="#ff0000" canAddFavorite={false} />
+        <span id="count">10件中10件</span>
+      </>,
+    )
     expect(favoriteButton()).toBeDisabled()
-    expect(
-      screen.getByText(
-        'お気に入りは10件までです。不要な色を削除してください。',
-      ),
-    ).toBeInTheDocument()
+    expect(favoriteButton()).toHaveAccessibleDescription('10件中10件')
+  })
+
+  it('変換欄には上限の案内の行を出さない', () => {
+    render(<Controlled initial="#ff0000" canAddFavorite={false} />)
+    expect(screen.queryByText(/不要な色を削除/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/10件まで/)).not.toBeInTheDocument()
   })
 
   it('上限でも登録済みの色なら押せる（外せる）', () => {
     render(<Controlled initial="#ff0000" isFavorite canAddFavorite={false} />)
     expect(favoriteButton()).toBeEnabled()
-    expect(screen.queryByText(/10件までです/)).not.toBeInTheDocument()
+    expect(favoriteButton()).not.toHaveAttribute('aria-describedby')
   })
 })
