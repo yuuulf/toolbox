@@ -17,7 +17,7 @@
 
 - [x] 3.1 `npm run lint` / `npm run format:check` / `npm test` / `npm run build` がすべて成功することを確認する
 - [x] 3.2 開発サーバーで `http://localhost:3000/toolbox` から一覧・ナビゲーション・ヘッダーのリンクをたどり、全ツールが表示・動作し、`/toolbox/tools/does-not-exist` で 404 ページが出ることを確認する。あわせて `out/` を `/toolbox` の下で配信し（リポジトリの外の一時的な静的サーバーで）、各ツールの直接アクセス・再読み込み、`/toolbox/tools/does-not-exist` が 404 ステータスで 404 ページになること、アセットの 404 がないことを確認する
-- [ ] 3.3 ユーザーの確認を取ってから、GitHub Pages を公開元「GitHub Actions」で有効にする（design.md D5）。`gh api repos/yuuulf/toolbox/pages` が `build_type: workflow` を返すことを確認
+- [x] 3.3 ユーザーの確認を取ってから、GitHub Pages を公開元「GitHub Actions」で有効にする（design.md D5）。`gh api repos/yuuulf/toolbox/pages` が `build_type: workflow` を返すことを確認
 - [ ] 3.4 ユーザーの確認を取ってから、作業ブランチを push して PR を作り、CI（`verify`）が成功することを確認
 
 ## Workflow follow-up
