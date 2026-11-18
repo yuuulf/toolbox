@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import { CharCounter } from './char-counter'
+import { ColorTool } from './color-tool/color-tool'
 import { IdGenerator } from './id-generator'
 import { JsonFormatter } from './json-formatter'
 
@@ -36,6 +37,14 @@ export const tools: ToolDefinition[] = [
     description: 'UUID v4 とランダムなパスワードを生成します。',
     storage: 'localStorage',
     component: IdGenerator,
+  },
+  {
+    slug: 'color-tool',
+    name: 'カラー変換/コントラスト',
+    description:
+      'HEX・RGB・HSL を相互に変換し、文字色と背景色のコントラスト比を確かめます。',
+    storage: 'localStorage',
+    component: ColorTool,
   },
 ]
 

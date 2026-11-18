@@ -23,11 +23,12 @@ describe('ツール登録情報', () => {
     }
   })
 
-  it('初期ツール3件が登録されている', () => {
+  it('4件のツールが登録されている', () => {
     expect(tools.map((tool) => tool.slug)).toEqual([
       'json-formatter',
       'char-counter',
       'id-generator',
+      'color-tool',
     ])
   })
 })
