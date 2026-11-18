@@ -37,6 +37,10 @@
 - 本番ビルドだけに付ける案もあった（`NODE_ENV` や環境変数で切り替える）。しかし開発時と公開版でパスが変わると、ベースパスの付け忘れ（`<a href="/...">` や `fetch('/...')` を直書きするなど）に開発中に気づけない。AGENTS.md は環境変数を使わない方針でもあるため、常に付ける。
 - 開発サーバーは `http://localhost:3000/toolbox` で開くことになる。README に書く。
 
+### D2a. `trailingSlash: true` でページを `<path>/index.html` として書き出す
+
+既定の書き出しでは `tools/<slug>.html` と、クライアント遷移用のデータを入れた同名のディレクトリ `tools/<slug>/` が並ぶ。GitHub Pages は同名のディレクトリがあるとそちらを優先して `tools/<slug>/` にリダイレクトし、`index.html` がないので 404 になる（実装中に、この規則をまねた静的サーバーで再現した）。`trailingSlash: true` にすると `tools/<slug>/index.html` になり、`/tools/<slug>` は `/tools/<slug>/` にリダイレクトされて表示される。リンクの URL は末尾に `/` が付く。
+
 ### D3. 未登録 slug の 404 は `dynamicParams = false` と GitHub Pages の `404.html` で返す
 
 - `proxy.ts` と `proxy.test.ts` を削除する。static export では Proxy を使えない。

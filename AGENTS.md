@@ -55,12 +55,12 @@ lib/                      # React に依存しないロジック
   tools/
     json-format.ts
 public/                   # 静的ファイル（必要になったら作る）
-proxy.ts                  # 未登録の /tools/<slug> に 404 を返す
 .github/
-  actions/verify/         # lint / format:check / test / build（CI とアーカイブで共通）
+  actions/verify/         # lint / format:check / test / build（CI・アーカイブ・デプロイで共通）
   workflows/
     ci.yml                # PR ごとに verify を実行
     openspec-archive.yml  # archive ラベルで OpenSpec の change をアーカイブ
+    deploy.yml            # main へのマージで verify 後に GitHub Pages へ公開
 ```
 
 ### Next.js の規約
@@ -77,8 +77,9 @@ proxy.ts                  # 未登録の /tools/<slug> に 404 を返す
 - `<title>` などのメタ情報は `metadata` / `generateMetadata` で設定し、`<head>` を直接書かない
 - 内部リンクは `next/link`、画像は `next/image`、フォントは `next/font` を使う
 - Route Handler（`app/**/route.ts`）や Server Action でユーザー入力を処理しない（データ方針のため）
-- Cache Components が有効（`next.config.ts`）。リクエスト時に決まる値（未登録 slug の `params`、`usePathname` など）は `<Suspense>` の内側で扱う。ページ内の `notFound()` はシェル送信後だとステータスが 200 になるため、404 ステータスが必要な判定は `proxy.ts`（旧 middleware）で行う
-- `proxy.ts` は matcher で対象パスを絞り、ユーザー入力の処理や外部通信には使わない
+- static export（`output: 'export'`）でビルドし、GitHub Pages で静的ファイルとして配信する。サーバーで動く機能（Proxy・Route Handler・Server Actions・rewrites / redirects / headers・ISR・`cookies()` などのリクエスト時の値・既定ローダーの `next/image` 最適化）は使わない。Cache Components も static export と同時に使えないため有効にしない
+- `basePath` は `/toolbox`（開発サーバーも `http://localhost:3000/toolbox`）。`trailingSlash: true` でページを `<path>/index.html` として書き出す（GitHub Pages が同名のディレクトリを優先して 404 になるのを避けるため）。内部リンクは `next/link` を使えば自動で付くので、`<a href="/...">` や `fetch('/...')` のようにパスを直書きしない
+- 動的ルートは `generateStaticParams` で書き出すページを列挙し、`dynamicParams = false` にする。列挙していないパスはファイルがないため、公開先が `404.html`（`app/not-found.tsx`）を 404 ステータスで返す
 
 ### コンポーネント分割
 

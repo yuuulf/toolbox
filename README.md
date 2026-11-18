@@ -2,6 +2,8 @@
 
 ブラウザ内で完結する便利ツール集です。Next.js（App Router）+ Tailwind CSS で作っています。
 
+公開版: https://yuuulf.github.io/toolbox/
+
 ## ツール一覧
 
 | ツール                  | パス                    | 内容                                                                             | ブラウザへの保存                         |
@@ -17,6 +19,7 @@
 - 入力した内容や生成した結果は、サーバーや外部サービスに送信しません。処理はすべてブラウザ内で行います。
 - 保存するのは一部ツールの設定、カラー変換/コントラストで自分で登録したお気に入りの色、チェックリストの項目とチェックの状態だけで、保存先はブラウザの localStorage です。それ以外の入力内容や生成した値は保存しません。
 - チェックリストの繰り返しのリスト（月次・週次・日次）のチェックの記録は、日次は直近 90 日、週次は直近 52 週、月次は直近 24 か月だけ残し、それより古いものは自動で削除します。
+- localStorage はサイトごとに分かれるため、公開版とローカルの開発サーバーで保存した内容は共有されません。
 - localStorage が使えない環境（プライベートモードなど）でも、設定・お気に入り・チェックリストが保存されないだけでツールは動きます。
 
 ## セットアップ
@@ -29,26 +32,26 @@ npm install
 npm run dev
 ```
 
-http://localhost:3000 を開きます。mise をシェルで有効化していない場合は、`mise exec -- npm run dev` のようにコマンドの前に `mise exec --` を付けます。
+http://localhost:3000/toolbox を開きます（公開先に合わせて、すべてのパスが `/toolbox` の下にあります）。mise をシェルで有効化していない場合は、`mise exec -- npm run dev` のようにコマンドの前に `mise exec --` を付けます。
 
 ## コマンド
 
-| コマンド               | 内容                                         |
-| ---------------------- | -------------------------------------------- |
-| `npm run dev`          | 開発サーバーを起動                           |
-| `npm run build`        | 本番用にビルド                               |
-| `npm run start`        | ビルドしたアプリを起動                       |
-| `npm run lint`         | ESLint を実行                                |
-| `npm run format`       | Prettier で整形                              |
-| `npm run format:check` | 整形されているか確認（ファイルは変更しない） |
-| `npm test`             | テストを実行（Vitest）                       |
-| `npm run test:watch`   | テストをウォッチモードで実行                 |
+| コマンド               | 内容                                               |
+| ---------------------- | -------------------------------------------------- |
+| `npm run dev`          | 開発サーバーを起動                                 |
+| `npm run build`        | 本番用にビルド（静的ファイルを `out/` に書き出す） |
+| `npm run lint`         | ESLint を実行                                      |
+| `npm run format`       | Prettier で整形                                    |
+| `npm run format:check` | 整形されているか確認（ファイルは変更しない）       |
+| `npm test`             | テストを実行（Vitest）                             |
+| `npm run test:watch`   | テストをウォッチモードで実行                       |
 
-## CI と OpenSpec のアーカイブ
+## CI・デプロイと OpenSpec のアーカイブ
 
-GitHub Actions で次の2つを自動化しています（`.github/workflows/`）。
+GitHub Actions で次の3つを自動化しています（`.github/workflows/`）。
 
 - **CI**：PR の作成・更新のたびに `npm run lint` / `npm run format:check` / `npm test` / `npm run build` を実行します。
+- **デプロイ**：main にマージされるたびに、CI と同じ4つのコマンドを実行し、すべて成功したときだけ `npm run build` が書き出した静的ファイルを GitHub Pages（https://yuuulf.github.io/toolbox/）に公開します。失敗した場合は公開せず、前の版がそのまま残ります。Actions の画面から「デプロイ」を手動で実行して公開し直すこともできます。
 - **アーカイブ**：PR に `archive` ラベルを付けると、その PR が変更している OpenSpec の change をアーカイブします。spec への反映と `openspec/changes/archive/` への移動をコミットとして PR に追加し、結果を PR にコメントします。ラベルは成否に関わらず外れるので、付け直せば再実行します。
 
 main は保護されていて、PR を通し、CI（`verify`）が成功したときだけマージできます（直接 push・force push・削除は不可。管理者も同じ）。アーカイブのコミットに対する CI は承認待ちになるので、PR の Checks か Actions で **Approve and run** を押して承認し、`verify` が成功してからマージしてください。承認の画面が出ない場合は、PR を閉じて開き直すと CI が走ります。

@@ -1,0 +1,42 @@
+name: デプロイ
+
+on:
+  # main は PR 必須なので、main への push は PR のマージだけ
+  push:
+    branches: [main]
+  # Actions の画面から main を公開し直すため
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# マージが続いても公開の途中で取り消さず、順番に公開する
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # CI と同じ検証。どれかが失敗すればアップロードまで進まず、公開中の版がそのまま残る
+      - uses: ./.github/actions/verify
+      # verify の npm run build が static export で out/ に書き出したものを公開する
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    # 認証は GITHUB_TOKEN と OIDC で行うため、リポジトリにシークレットは置かない
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

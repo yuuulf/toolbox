@@ -2,6 +2,10 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTool, tools } from '@/components/tools/registry'
 
+// static export では登録済みの slug のページだけを書き出す。
+// 未登録の slug はファイルがないため、公開先（GitHub Pages）が 404.html を 404 ステータスで返す
+export const dynamicParams = false
+
 export function generateStaticParams() {
   return tools.map((tool) => ({ slug: tool.slug }))
 }
@@ -15,7 +19,6 @@ export async function generateMetadata({
   return { title: tool.name, description: tool.description }
 }
 
-// Cache Components では dynamicParams を使えないため、未登録 slug はここで 404 にする
 export default async function ToolPage({ params }: PageProps<'/tools/[slug]'>) {
   const { slug } = await params
   const tool = getTool(slug)
