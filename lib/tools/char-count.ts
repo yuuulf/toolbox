@@ -21,7 +21,7 @@ export function countText(text: string): TextCounts {
   }
 }
 
-function splitGraphemes(text: string): string[] {
+export function splitGraphemes(text: string): string[] {
   // Intl.Segmenter がない古いブラウザでは、コードポイント単位で数える（結合絵文字は複数文字になる）
   if (typeof Intl.Segmenter !== 'function') return Array.from(text)
   const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' })
