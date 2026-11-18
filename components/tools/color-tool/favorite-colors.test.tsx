@@ -12,6 +12,7 @@ function setup(favorites: string[]) {
       favorites={favorites}
       onSelect={onSelect}
       onRemove={onRemove}
+      countId="count"
     />,
   )
   return { onSelect, onRemove, user: userEvent.setup() }
@@ -52,9 +53,35 @@ describe('FavoriteColors', () => {
     expect(onRemove).toHaveBeenCalledWith('#ff0000')
   })
 
-  it('お気に入りがないときは、まだ登録がないことを表示する', () => {
+  it('お気に入りがないときは、0/10 とまだ登録がないことを表示する', () => {
     setup([])
+    expect(screen.getByText('0/10')).toBeInTheDocument()
     expect(screen.queryByRole('list')).not.toBeInTheDocument()
     expect(screen.getByText(/お気に入りはまだありません/)).toBeInTheDocument()
+  })
+
+  it('見出しの行に件数を表示し、読み上げ用の文言も置く', () => {
+    setup(['#111111', '#222222', '#333333'])
+    const heading = screen.getByRole('heading', { name: 'お気に入り' })
+    const row = heading.parentElement as HTMLElement
+    expect(row).toHaveTextContent('3/10')
+    expect(screen.getByText('3/10')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByText('10件中3件')).toHaveClass('sr-only')
+    expect(
+      screen.queryByText('不要な色を削除してください。'),
+    ).not.toBeInTheDocument()
+  })
+
+  it('上限のときは 10/10 だけを表示し、上限を知らせる文は出さない', () => {
+    setup(Array.from({ length: 10 }, (_, i) => `#00000${i}`))
+    expect(screen.getByText('10/10')).toBeInTheDocument()
+    expect(screen.queryByText(/不要な色|上限/)).not.toBeInTheDocument()
+  })
+
+  it('読み上げ用の件数に id を付け、読み上げ対象にする', () => {
+    setup(['#ff0000'])
+    const count = screen.getByText('10件中1件')
+    expect(count).toHaveAttribute('id', 'count')
+    expect(count).toHaveAttribute('aria-live', 'polite')
   })
 })

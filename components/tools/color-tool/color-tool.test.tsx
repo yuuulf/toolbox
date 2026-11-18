@@ -18,8 +18,9 @@ const colorInput = () => screen.getByLabelText('色')
 const favoriteButton = () => screen.getByRole('button', { name: 'お気に入り' })
 const favoriteList = () =>
   within(
-    screen.getByRole('heading', { name: 'お気に入り' })
-      .parentElement as HTMLElement,
+    screen
+      .getByRole('heading', { name: 'お気に入り' })
+      .closest('section') as HTMLElement,
   )
 const listedHexes = () =>
   favoriteList()
@@ -93,6 +94,17 @@ describe('ColorTool', () => {
     await user.click(favoriteList().getByRole('button', { name: '#336699' }))
     expect(colorInput()).toHaveValue('#336699')
     expect(favoriteButton()).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('上限のとき、未登録の色では星ボタンが押せず、件数が説明になる', async () => {
+    const ten = Array.from({ length: 10 }, (_, i) => `#00000${i}`)
+    localStorage.setItem(KEY, JSON.stringify(ten))
+    const { user } = await setup()
+    await typeColor(user, '#ff0000')
+    expect(favoriteButton()).toBeDisabled()
+    expect(favoriteButton()).toHaveAccessibleDescription('10件中10件')
+    expect(screen.getByText('10/10')).toBeInTheDocument()
+    expect(screen.queryByText(/不要な色/)).not.toBeInTheDocument()
   })
 
   it('一覧から削除できる', async () => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useSyncExternalStore } from 'react'
+import { useId, useState, useSyncExternalStore } from 'react'
 import { formatHex, parseColor } from '@/lib/tools/color'
 import type { Favorites } from '@/lib/tools/color-favorites'
 import {
@@ -54,6 +54,7 @@ function useFavoriteColors() {
 
 export function ColorTool() {
   const [color, setColor] = useState('')
+  const favoritesCountId = useId()
   const favorites = useFavoriteColors()
   const parsed = parseColor(color)
   const hex = parsed.ok ? formatHex(parsed.rgb) : null
@@ -64,28 +65,33 @@ export function ColorTool() {
     if (result.ok) favoritesStore.set(result.list)
   }
 
+  // 広い画面ではカラー変換とお気に入りを左、コントラスト比を右に並べ、1画面に収める。
+  // DOM の順序（変換 → お気に入り → コントラスト）は狭い画面と同じ
   return (
-    <div className="flex flex-col gap-8">
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">カラー変換</h2>
-        <ColorConverter
-          value={color}
-          onChange={setColor}
-          isFavorite={hex !== null && isFavorite(favorites, hex)}
-          canAddFavorite={canAddFavorite(favorites)}
-          onToggleFavorite={handleToggleFavorite}
-        />
-      </section>
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">お気に入り</h2>
-        <FavoriteColors
-          favorites={favorites}
-          onSelect={setColor}
-          onRemove={(target) =>
-            favoritesStore.set(removeFavorite(favorites, target))
-          }
-        />
-      </section>
+    <div className="flex flex-col gap-8 lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
+      <div className="flex flex-col gap-8">
+        <section className="flex flex-col gap-3">
+          <h2 className="text-lg font-semibold">カラー変換</h2>
+          <ColorConverter
+            value={color}
+            onChange={setColor}
+            isFavorite={hex !== null && isFavorite(favorites, hex)}
+            canAddFavorite={canAddFavorite(favorites)}
+            onToggleFavorite={handleToggleFavorite}
+            favoritesCountId={favoritesCountId}
+          />
+        </section>
+        <section>
+          <FavoriteColors
+            countId={favoritesCountId}
+            favorites={favorites}
+            onSelect={setColor}
+            onRemove={(target) =>
+              favoritesStore.set(removeFavorite(favorites, target))
+            }
+          />
+        </section>
+      </div>
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold">コントラスト比</h2>
         <ContrastChecker />

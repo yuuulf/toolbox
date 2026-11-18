@@ -76,7 +76,8 @@ function ContrastResult({
         <p className="text-base">通常の文字の見本です。The quick brown fox.</p>
         <p className="text-2xl font-bold">大きな文字の見本です。</p>
       </div>
-      <ul className="grid gap-2 sm:grid-cols-2">
+      {/* 広い画面ではツールが2列になり列幅が狭くなるため、1列に戻す */}
+      <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
         {evaluateWcag(ratio).map((result) => (
           <WcagItem key={`${result.level}-${result.size}`} result={result} />
         ))}
@@ -98,8 +99,8 @@ function WcagItem({ result }: { result: WcagResult }) {
       <span
         className={
           result.pass
-            ? 'font-semibold text-green-700 dark:text-green-400'
-            : 'font-semibold text-red-700 dark:text-red-400'
+            ? 'shrink-0 font-semibold whitespace-nowrap text-green-700 dark:text-green-400'
+            : 'shrink-0 font-semibold whitespace-nowrap text-red-700 dark:text-red-400'
         }
       >
         {result.pass ? '✓ 合格' : '✗ 不合格'}
