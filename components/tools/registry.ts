@@ -4,6 +4,7 @@ import { Checklist } from './checklist/checklist'
 import { ColorTool } from './color-tool/color-tool'
 import { IdGenerator } from './id-generator'
 import { JsonFormatter } from './json-formatter'
+import { TextDiff } from './text-diff/text-diff'
 
 export type ToolDefinition = {
   /** URL に使う識別子（`/tools/<slug>`）。kebab-case */
@@ -54,6 +55,14 @@ export const tools: ToolDefinition[] = [
       '月次・週次・日次の繰り返しのチェックリストと、一時的なチェックリストを使えます。',
     storage: 'localStorage',
     component: Checklist,
+  },
+  {
+    slug: 'text-diff',
+    name: 'テキスト差分比較',
+    description:
+      '2つのテキストを行ごとに比べ、追加・削除された行と変わった文字を左右に並べて表示します。',
+    storage: 'none',
+    component: TextDiff,
   },
 ]
 
