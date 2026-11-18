@@ -21,7 +21,7 @@ export function generateUuids(count: number): UuidResult {
   return { ok: true, uuids: Array.from({ length: count }, randomUuid) }
 }
 
-function randomUuid(): string {
+export function randomUuid(): string {
   // randomUUID は安全なコンテキスト（HTTPS / localhost）でしか使えないため、ない場合は自前で組み立てる
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
   const bytes = crypto.getRandomValues(new Uint8Array(16))

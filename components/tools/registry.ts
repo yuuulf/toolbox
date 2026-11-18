@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import { CharCounter } from './char-counter'
+import { Checklist } from './checklist/checklist'
 import { ColorTool } from './color-tool/color-tool'
 import { IdGenerator } from './id-generator'
 import { JsonFormatter } from './json-formatter'
@@ -45,6 +46,14 @@ export const tools: ToolDefinition[] = [
       'HEX・RGB・HSL を相互に変換し、文字色と背景色のコントラスト比を確かめます。',
     storage: 'localStorage',
     component: ColorTool,
+  },
+  {
+    slug: 'checklist',
+    name: 'チェックリスト',
+    description:
+      '月次・週次・日次の繰り返しのチェックリストと、一時的なチェックリストを使えます。',
+    storage: 'localStorage',
+    component: Checklist,
   },
 ]
 
