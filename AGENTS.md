@@ -52,9 +52,12 @@ components/               # React コンポーネント
     json-formatter.tsx
 lib/                      # React に依存しないロジック
   storage.ts
+  base-path.ts            # ベースパス（/toolbox）。next.config.ts と metadata.icons で共有
   tools/
     json-format.ts
-public/                   # 静的ファイル（必要になったら作る）
+public/                   # 静的ファイル（basePath の下で配信される）
+  favicon-light.png       # ファビコン（OS のライト/ダークで切り替え。app/layout.tsx の metadata.icons）
+  favicon-dark.png
 .github/
   actions/verify/         # lint / format:check / test / build（CI・アーカイブ・デプロイで共通）
   workflows/
@@ -78,7 +81,7 @@ public/                   # 静的ファイル（必要になったら作る）
 - 内部リンクは `next/link`、画像は `next/image`、フォントは `next/font` を使う
 - Route Handler（`app/**/route.ts`）や Server Action でユーザー入力を処理しない（データ方針のため）
 - static export（`output: 'export'`）でビルドし、GitHub Pages で静的ファイルとして配信する。サーバーで動く機能（Proxy・Route Handler・Server Actions・rewrites / redirects / headers・ISR・`cookies()` などのリクエスト時の値・既定ローダーの `next/image` 最適化）は使わない。Cache Components も static export と同時に使えないため有効にしない
-- `basePath` は `/toolbox`（開発サーバーも `http://localhost:3000/toolbox`）。`trailingSlash: true` でページを `<path>/index.html` として書き出す（GitHub Pages が同名のディレクトリを優先して 404 になるのを避けるため）。内部リンクは `next/link` を使えば自動で付くので、`<a href="/...">` や `fetch('/...')` のようにパスを直書きしない
+- `basePath` は `/toolbox`（開発サーバーも `http://localhost:3000/toolbox`）。値は `lib/base-path.ts` の `BASE_PATH` で、`metadata.icons` のように basePath が自動で付かない URL にはこれを付ける。`trailingSlash: true` でページを `<path>/index.html` として書き出す（GitHub Pages が同名のディレクトリを優先して 404 になるのを避けるため）。内部リンクは `next/link` を使えば自動で付くので、`<a href="/...">` や `fetch('/...')` のようにパスを直書きしない
 - 動的ルートは `generateStaticParams` で書き出すページを列挙し、`dynamicParams = false` にする。列挙していないパスはファイルがないため、公開先が `404.html`（`app/not-found.tsx`）を 404 ステータスで返す
 
 ### コンポーネント分割
