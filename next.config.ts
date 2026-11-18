@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { BASE_PATH } from './lib/base-path'
 
 const nextConfig: NextConfig = {
   // GitHub Pages で静的ファイルとして配信するため、ビルドで out/ に書き出す。
@@ -6,7 +7,7 @@ const nextConfig: NextConfig = {
   output: 'export',
   // プロジェクトサイト（https://yuuulf.github.io/toolbox/）の下で配信されるため。
   // 付け忘れに開発中に気づけるよう、開発サーバーでも同じパスにする
-  basePath: '/toolbox',
+  basePath: BASE_PATH,
   // ページを tools/<slug>/index.html として書き出す。tools/<slug>.html だと、同じ名前のディレクトリ
   // （クライアント遷移用のデータ）があるため GitHub Pages がディレクトリを優先し、直接開くと 404 になる
   trailingSlash: true,

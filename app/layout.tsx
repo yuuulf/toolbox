@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import { Header } from '@/components/header'
 import { ToolNav, ToolNavList } from '@/components/tool-nav'
 import { tools } from '@/components/tools/registry'
+import { BASE_PATH } from '@/lib/base-path'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -11,6 +12,20 @@ export const metadata: Metadata = {
     template: '%s | toolbox',
   },
   description: 'ブラウザ内で完結する便利ツール集',
+  // OS のライト/ダーク設定で切り替えるため、media を指定できる metadata.icons を使う（app/icon.png では指定できない）。
+  // ここの URL には basePath が自動で付かないので、BASE_PATH を付ける
+  icons: {
+    icon: [
+      {
+        url: `${BASE_PATH}/favicon-light.png`,
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: `${BASE_PATH}/favicon-dark.png`,
+        media: '(prefers-color-scheme: dark)',
+      },
+    ],
+  },
 }
 
 // Client Component にはシリアライズできる値だけ渡す（component は含めない）
