@@ -11,6 +11,8 @@
   - 背景を透明にし、マークの周りの余白を詰める（元画像ではマークが幅の約6割しかなく、16pxのタブでは小さすぎるため）
 - OS のライト/ダーク設定に合わせて、ライト用とダーク用のアイコンを切り替える
 - 既定の `app/favicon.ico`（Next.js のロゴ）を削除する
+- ヘッダーのアプリ名「toolbox」の左に、同じアイコンを表示する（OS のライト/ダーク設定で切り替える）
+- ヘッダーのアプリ名にポインタを重ねたときの下線をなくす
 
 ## Capabilities
 
@@ -20,7 +22,7 @@
 
 ### Modified Capabilities
 
-- `toolbox-shell`: すべてのページで toolbox のファビコンを表示し、OS のライト/ダーク設定に合わせて切り替える要件を追加する
+- `toolbox-shell`: すべてのページで toolbox のファビコンを表示し、OS のライト/ダーク設定に合わせて切り替える要件を追加する。「共通ヘッダーとツール間ナビゲーション」に、アプリ名の隣にアイコンを表示することを加える
 
 ## データ保存
 
@@ -29,7 +31,6 @@
 ## Out of scope
 
 - iOS のホーム画面用アイコン（`apple-icon`）、PWA の manifest、OGP 画像
-- ヘッダーなど画面内へのロゴの表示
 - アイコンのデザインそのものの変更（背景の透明化と余白の切り詰め以外）
 
 ## Impact
@@ -37,6 +38,7 @@
 - `public/favicon-light.png`・`public/favicon-dark.png` の追加（`public/` を新しく作る）
 - `app/favicon.ico` の削除
 - `app/layout.tsx` の `metadata.icons`
+- `components/header.tsx`（アイコンの表示、ホバー時の下線の削除）と `components/header.test.tsx`
 - `lib/base-path.ts` の追加と `next.config.ts`（ベースパスを1か所で定義する）
 - AGENTS.md の構成図
 - 依存パッケージの追加はなし（画像の加工はリポジトリの外で行い、結果の PNG だけをコミットする）

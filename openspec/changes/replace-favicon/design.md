@@ -52,6 +52,15 @@ icons: {
 
 - 検討した他の方法: URL に `/toolbox` を直書きする。`next.config.ts` と2か所で同じ値を管理することになり、片方だけ変えたときにファビコンが 404 になるので採らない。
 
+### D4. ヘッダーのアイコンは `next/image` で PNG を import し、`dark:` で切り替える
+
+- `components/header.tsx` で `public/favicon-light.png` と `public/favicon-dark.png` を import し、`next/image` で 24×24（`size-6`。アプリ名 `text-lg` の行の高さに収まる大きさ）で表示する。
+  - import した画像はビルド時に `/toolbox` 付きの URL になるため、`BASE_PATH` を付けなくてよい。幅と高さも自動で決まる。
+  - static export では既定のローダーの画像最適化を使えないため、`unoptimized` を指定する。
+- 2枚を並べ、ライト用に `dark:hidden`、ダーク用に `hidden dark:block` を付けて切り替える。画面のほかの部分と同じく `dark:` バリアントで OS 設定に追従させるため（`<picture>` の `media` でも切り替えられるが、`next/image` では書けない）。
+- 画像は `alt=""` の飾りにし、リンク名は今までどおりテキストの「toolbox」から決まるようにする。
+- アイコンと文字は `inline-flex items-center gap-2` で並べる。リンクの `hover:underline` は外す。ほかにホバー時の表示は加えない。キーボード操作時のフォーカス枠はブラウザの既定のまま残る。
+
 ## Risks / Trade-offs
 
 - [`media` 付きの `<link rel="icon">` に対応しないブラウザがある（Safari など）] → そうしたブラウザは片方を使う。ライト用を先に書くので、多くの場合はライト用になる。カードが濃いグレーなので、ダークのタブでも緑のカードと形で見分けられる。

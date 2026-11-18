@@ -12,13 +12,18 @@
 - [x] 2.2 `app/layout.tsx` の `metadata.icons` に、ライト用・ダーク用を `media` 付きで書き、`app/favicon.ico` を削除する（design.md D2）。`app/layout.test.ts` で、`metadata.icons` の2つの URL が `BASE_PATH` で始まり、`media` がそれぞれ light / dark であり、指す画像が `public/` に存在することを検証する。`npm test` が成功し、`npm run build` の `out/index.html` に `/toolbox/favicon-light.png`・`/toolbox/favicon-dark.png` の `<link rel="icon">` が `media` 付きで出て、Next.js のロゴの `favicon.ico` の参照がないことを確認
 - [x] 2.3 AGENTS.md の構成図に `lib/base-path.ts` と `public/`（ファビコン）を反映する。`npm run format:check` が通ることを確認
 
-## 3. 最終確認
+## 3. ヘッダー
 
-- [x] 3.1 `npm run lint` / `npm run format:check` / `npm test` / `npm run build` がすべて成功することを確認する
-- [x] 3.2 開発サーバーで、ライト・ダークそれぞれの表示でトップページとツールページを開き、対応するファビコンの画像が読み込まれる（`/toolbox/favicon-*.png` が 200）ことと、タブの見た目をスクリーンショットで確認する（確認用のツールはリポジトリの外に置く）
-- [ ] 3.3 ユーザーの確認を取ってから、作業ブランチを push して PR を作り、CI（`verify`）が成功することを確認
+- [ ] 3.1 `components/header.tsx` で、アプリ名「toolbox」の左にライト用・ダーク用のアイコンを `next/image`（import した PNG、`unoptimized`、24×24、`alt=""`）で表示し、`dark:hidden` / `hidden dark:block` で切り替える。あわせてリンクの `hover:underline` を外す（design.md D4）。`components/header.test.tsx` で、トップへのリンクの名前が「toolbox」のままであること、リンクの中に2枚のアイコンがあり読み上げ対象にならない（`alt=""`）こと、それぞれのクラスで切り替わることを検証する。`npm test` が成功することを確認
+- [ ] 3.2 `npm run build` で、`out/index.html` のヘッダーのアイコンの URL が `/toolbox` で始まり、その画像が `out/` に存在することを確認
+
+## 4. 最終確認
+
+- [ ] 4.1 `npm run lint` / `npm run format:check` / `npm test` / `npm run build` がすべて成功することを確認する
+- [ ] 4.2 開発サーバーで、ライト・ダークそれぞれの表示でトップページとツールページを開き、対応するファビコンの画像が読み込まれる（`/toolbox/favicon-*.png` が 200）こととタブの見た目、ヘッダーにそのモードのアイコンが1つだけ表示されること、ホバーしても下線が出ないこと、アイコンのクリックでトップへ戻ることをスクリーンショットと操作で確認する（確認用のツールはリポジトリの外に置く）
+- [ ] 4.3 ユーザーの確認を取ってから、作業ブランチを push して PR を作り、CI（`verify`）が成功することを確認
 
 ## Workflow follow-up
 
 - レビューで spec と実装の整合を確認したら、PR に `archive` ラベルを付けてアーカイブし、承認待ちの CI を Approve and run で通してからマージする
-- マージ後、デプロイが成功し、公開版で新しいファビコンが表示されることを確認する
+- マージ後、デプロイが成功し、公開版で新しいファビコンとヘッダーのアイコンが表示されることを確認する
