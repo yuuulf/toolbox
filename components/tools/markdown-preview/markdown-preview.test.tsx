@@ -75,14 +75,17 @@ describe('MarkdownPreview', () => {
     expect(setItem).not.toHaveBeenCalled()
   })
 
-  it('保存すると「保存しました。」を出し、作り直すと復元される', async () => {
+  it('保存すると ✓ のアイコンと読み上げで伝え（画面に文字は出さない）、作り直すと復元される', async () => {
     const user = userEvent.setup()
     const { unmount } = render(<MarkdownPreview />)
     fireEvent.change(input(), { target: { value: '# 保存する' } })
-    await user.click(screen.getByRole('button', { name: '保存' }))
-    expect(screen.getByText('保存しました。').getAttribute('aria-live')).toBe(
-      'polite',
-    )
+    const saveButton = screen.getByRole('button', { name: '保存' })
+    expect(saveButton.textContent).toBe('')
+    await user.click(saveButton)
+    expect(saveButton.querySelector('svg')?.dataset.icon).toBe('check')
+    const live = screen.getByText('保存しました')
+    expect(live.getAttribute('aria-live')).toBe('polite')
+    expect(live.className).toContain('sr-only')
     expect(JSON.parse(localStorage.getItem(MARKDOWN_DRAFT_KEY)!)).toBe(
       '# 保存する',
     )
@@ -92,25 +95,28 @@ describe('MarkdownPreview', () => {
     expect(input().value).toBe('# 保存する')
   })
 
-  it('保存の後に入力を変えると「保存しました。」を消し、保存値は変わらない', async () => {
+  it('保存の後に入力を変えても、保存値は変わらない', async () => {
     const user = userEvent.setup()
     render(<MarkdownPreview />)
     fireEvent.change(input(), { target: { value: '1回目' } })
     await user.click(screen.getByRole('button', { name: '保存' }))
     fireEvent.change(input(), { target: { value: '2回目' } })
-    expect(screen.queryByText('保存しました。')).toBeNull()
     expect(JSON.parse(localStorage.getItem(MARKDOWN_DRAFT_KEY)!)).toBe('1回目')
   })
 
-  it('保存できないときは「保存できませんでした。」を出し、そのまま使える', async () => {
+  it('保存できないときは × のアイコンと「保存できませんでした」の読み上げで伝え、そのまま使える', async () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('denied')
     })
     const user = userEvent.setup()
     render(<MarkdownPreview />)
     fireEvent.change(input(), { target: { value: '**続ける**' } })
-    await user.click(screen.getByRole('button', { name: '保存' }))
-    expect(screen.getByText('保存できませんでした。')).toBeTruthy()
+    const saveButton = screen.getByRole('button', { name: '保存' })
+    await user.click(saveButton)
+    expect(saveButton.querySelector('svg')?.dataset.icon).toBe('cross')
+    expect(screen.getByText('保存できませんでした').className).toContain(
+      'sr-only',
+    )
     expect(preview().textContent).toContain('続ける')
   })
 })

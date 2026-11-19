@@ -14,6 +14,13 @@ const input = () => screen.getByLabelText('週次の項目')
 const addButton = () => screen.getByRole('button', { name: '追加' })
 
 describe('AddItemForm', () => {
+  it('追加ボタンは文字のない「+」のアイコンで、名前とツールチップは「追加」', () => {
+    render(<AddItemForm listLabel="週次" itemCount={0} onAdd={vi.fn()} />)
+    expect(addButton().textContent).toBe('')
+    expect(addButton().getAttribute('title')).toBe('追加')
+    expect(addButton().querySelector('svg[data-icon="plus"]')).not.toBeNull()
+  })
+
   it('「追加」で onAdd に入力が渡り、入力欄が空になる', async () => {
     const { onAdd, user } = setup()
     await user.type(input(), '週報を書く')
