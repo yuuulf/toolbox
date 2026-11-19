@@ -22,7 +22,7 @@
 
 ### D1. 自動保存はフック `useAutoSave` にまとめる
 
-- `components/tools/markdown-preview/use-auto-save.ts` に置く。`markdown-preview.tsx` に入れると 150 行を超えるため、同じディレクトリの部品として分ける（このツール専用なので `hooks/` には置かない）
+- `components/tools/markdown-preview/use-auto-save.ts` に置く。タイマーとページを離れるときの処理は表示と関係がなく、単独でテストしやすいので、同じディレクトリの部品として分ける（このツール専用なので `hooks/` には置かない）
 - 引数は保存する値・保存してよいか（`ready`）・保存の関数（`saveDraft`）。戻り値は保存できなかったかどうか（`failed: boolean`）
 - 動作:
   - 値が変わるたびにタイマーを `AUTOSAVE_DELAY_MS`（500ms）で張り直し、止まったら1回だけ保存する

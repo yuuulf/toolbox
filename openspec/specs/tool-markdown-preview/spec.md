@@ -1,7 +1,7 @@
 # tool-markdown-preview Specification
 
 ## Purpose
-Markdown を入力と同時にプレビューし、GFM と Mermaid の図もブラウザ内で表示するツール。入力内容は「保存」を押したときだけ localStorage に1件保存する。
+Markdown を入力と同時にプレビューし、GFM と Mermaid の図もブラウザ内で表示するツール。入力内容は localStorage に自動で1件保存する。
 
 ## Requirements
 

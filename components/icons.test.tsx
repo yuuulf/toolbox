@@ -1,15 +1,12 @@
 // @vitest-environment jsdom
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { CheckIcon, CrossIcon, PlusIcon, SaveIcon, TrashIcon } from './icons'
+import { PlusIcon, TrashIcon } from './icons'
 
 describe('アイコン', () => {
   it.each([
     ['plus', PlusIcon],
     ['trash', TrashIcon],
-    ['save', SaveIcon],
-    ['check', CheckIcon],
-    ['cross', CrossIcon],
   ])('%s は読み上げられない', (name, Component) => {
     const { container } = render(<Component />)
     const svg = container.querySelector('svg')!

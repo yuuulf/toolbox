@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MARKDOWN_DRAFT_KEY } from '@/lib/tools/markdown-preview'
 import { MarkdownPreview } from './markdown-preview'
+import { AUTOSAVE_DELAY_MS } from './use-auto-save'
 
 vi.mock('./mermaid-diagram', () => ({
   MermaidDiagram: ({ code }: { code: string }) => <div>{code}</div>,
@@ -58,65 +59,73 @@ describe('MarkdownPreview', () => {
     expect(preview()).toBeTruthy()
   })
 
-  it('どの表示でも、保存ボタンと表示の切り替えを使える', async () => {
+  it('どの表示でも、表示の切り替えを使え、保存ボタンはない', async () => {
     const user = userEvent.setup()
     render(<MarkdownPreview />)
     for (const name of ['入力のみ', 'プレビューのみ', '並べて表示']) {
       await user.click(screen.getByRole('radio', { name }))
-      expect(screen.getByRole('button', { name: '保存' })).toBeTruthy()
+      expect(screen.queryByRole('button', { name: '保存' })).toBeNull()
       expect(screen.getByRole('radiogroup', { name: '表示' })).toBeTruthy()
     }
   })
 
-  it('入力しただけでは保存しない', () => {
-    const setItem = vi.spyOn(Storage.prototype, 'setItem')
-    render(<MarkdownPreview />)
-    fireEvent.change(input(), { target: { value: 'a' } })
-    expect(setItem).not.toHaveBeenCalled()
-  })
-
-  it('保存すると ✓ のアイコンと読み上げで伝え（画面に文字は出さない）、作り直すと復元される', async () => {
-    const user = userEvent.setup()
-    const { unmount } = render(<MarkdownPreview />)
-    fireEvent.change(input(), { target: { value: '# 保存する' } })
-    const saveButton = screen.getByRole('button', { name: '保存' })
-    expect(saveButton.textContent).toBe('')
-    await user.click(saveButton)
-    expect(saveButton.querySelector('svg')?.dataset.icon).toBe('check')
-    const live = screen.getByText('保存しました')
-    expect(live.getAttribute('aria-live')).toBe('polite')
-    expect(live.className).toContain('sr-only')
-    expect(JSON.parse(localStorage.getItem(MARKDOWN_DRAFT_KEY)!)).toBe(
-      '# 保存する',
-    )
-
-    unmount()
-    render(<MarkdownPreview />)
-    expect(input().value).toBe('# 保存する')
-  })
-
-  it('保存の後に入力を変えても、保存値は変わらない', async () => {
-    const user = userEvent.setup()
-    render(<MarkdownPreview />)
-    fireEvent.change(input(), { target: { value: '1回目' } })
-    await user.click(screen.getByRole('button', { name: '保存' }))
-    fireEvent.change(input(), { target: { value: '2回目' } })
-    expect(JSON.parse(localStorage.getItem(MARKDOWN_DRAFT_KEY)!)).toBe('1回目')
-  })
-
-  it('保存できないときは × のアイコンと「保存できませんでした」の読み上げで伝え、そのまま使える', async () => {
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new Error('denied')
+  describe('自動保存', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
     })
-    const user = userEvent.setup()
-    render(<MarkdownPreview />)
-    fireEvent.change(input(), { target: { value: '**続ける**' } })
-    const saveButton = screen.getByRole('button', { name: '保存' })
-    await user.click(saveButton)
-    expect(saveButton.querySelector('svg')?.dataset.icon).toBe('cross')
-    expect(screen.getByText('保存できませんでした').className).toContain(
-      'sr-only',
-    )
-    expect(preview().textContent).toContain('続ける')
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    const saved = () => {
+      const raw = localStorage.getItem(MARKDOWN_DRAFT_KEY)
+      return raw === null ? null : JSON.parse(raw)
+    }
+
+    it('入力して待つと保存され、作り直すと復元される', () => {
+      const { unmount } = render(<MarkdownPreview />)
+      fireEvent.change(input(), { target: { value: '# 自動で保存' } })
+      act(() => vi.advanceTimersByTime(AUTOSAVE_DELAY_MS))
+      expect(saved()).toBe('# 自動で保存')
+
+      unmount()
+      render(<MarkdownPreview />)
+      expect(input().value).toBe('# 自動で保存')
+    })
+
+    it('入力しただけで待たなければ、まだ保存しない', () => {
+      render(<MarkdownPreview />)
+      fireEvent.change(input(), { target: { value: 'a' } })
+      act(() => vi.advanceTimersByTime(AUTOSAVE_DELAY_MS - 1))
+      expect(saved()).toBeNull()
+    })
+
+    it('保存できないときは文言を読み上げ用の領域に出し、そのまま使える。後で保存できたら消す', () => {
+      const setItem = vi
+        .spyOn(Storage.prototype, 'setItem')
+        .mockImplementation(() => {
+          throw new Error('denied')
+        })
+      render(<MarkdownPreview />)
+      fireEvent.change(input(), { target: { value: '**続ける**' } })
+      act(() => vi.advanceTimersByTime(AUTOSAVE_DELAY_MS))
+      const message = screen.getByText(
+        '自動保存できません。再読み込みすると入力が消えます。',
+      )
+      expect(message.getAttribute('aria-live')).toBe('polite')
+      expect(message.className).not.toContain('sr-only')
+      expect(preview().textContent).toContain('続ける')
+
+      setItem.mockRestore()
+      fireEvent.change(input(), { target: { value: '**続ける**!' } })
+      act(() => vi.advanceTimersByTime(AUTOSAVE_DELAY_MS))
+      expect(
+        screen.queryByText(
+          '自動保存できません。再読み込みすると入力が消えます。',
+        ),
+      ).toBeNull()
+      expect(saved()).toBe('**続ける**!')
+    })
   })
 })
