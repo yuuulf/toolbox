@@ -41,6 +41,10 @@
 
 - `components.code` で `className` が `language-mermaid` のブロックを `MermaidDiagram` に渡す（`pre` の中身として）。それ以外のコードブロックは等幅の `pre`/`code` で表示する。
 - `MermaidDiagram` は初回の描画で `import('mermaid')` を呼ぶ。読み込みはモジュール内で1回だけにし（Promise を使い回す）、`mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme })` を呼ぶ。`securityLevel: 'strict'` は、図の中のクリック操作や HTML の埋め込みを無効にするため。
+- 実装中の確認で、`strict` だけでは図のラベルに書いた `<img src=外部URL>` が（`onerror` は消されるものの）読み込まれ、外部へ通信することが分かった。さらに図の中の `%%{init: {...}}%%` や先頭の `config` で、`htmlLabels` などの設定を変えられた。そこで次の2つを加える。
+  - `htmlLabels: false`: ラベルを HTML ではなく SVG の文字として描く
+  - `secure`: Mermaid の既定の6項目（`secure`・`securityLevel`・`startOnLoad`・`maxTextSize`・`suppressErrorRendering`・`maxEdges`）に `htmlLabels`・`themeCSS` を加え、図の中の設定で変えられないようにする
+  - ラベルの `<img>`、`style` / `classDef` の `url()`、`themeCSS`、`%%{init}%%` と先頭の `config` による上書き、シーケンス図、Markdown 文字列のラベルの10通りで、外部への通信とスクリプトの実行が起きないことをブラウザで確かめた
 - `mermaid.render(id, code)` が返す SVG 文字列を `dangerouslySetInnerHTML` で入れる。SVG は `strict` の設定で Mermaid が中身をサニタイズしたもので、入力の HTML がそのまま入ることはない。
 - `render` が例外を投げたら「図を描けませんでした。」とエラーの内容、元のコードを表示する。図ごとに独立しているので、ほかの図や Markdown は表示され続ける。
 - `id` は `useId` から作る（`:` を除いた文字列にする。Mermaid が CSS セレクタに使うため）。
@@ -67,7 +71,7 @@
 ### D7. 画面の配置（1470×800 に収める）
 
 - 上段に表示の切り替えと「保存」ボタン・保存の結果（1行、約 36px）。
-- 下段に入力欄とプレビュー。どちらも高さ `h-112`（448px）で中をスクロールする。概算で 230（周り）+ 36 + 16 + 448 = 730px で 800px に収まる。実装後に実測で確かめる。
+- 下段に入力欄とプレビュー。どちらも高さ `h-108`（432px）で中をスクロールする。計画では `h-112`（448px）としていたが、実測で入力欄のラベルと余白の分が足りず 806px になったため 16px 下げた。
 - ファイル構成（`components/tools/markdown-preview/`）:
   - `markdown-preview.tsx`（`MarkdownPreview`。表示の切り替え・保存・配置）
   - `markdown-view.tsx`（`MarkdownView`。`react-markdown` と要素ごとの見た目）

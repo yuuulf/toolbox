@@ -23,7 +23,7 @@ describe('ツール登録情報', () => {
     }
   })
 
-  it('6件のツールが登録されている', () => {
+  it('7件のツールが登録されている', () => {
     expect(tools.map((tool) => tool.slug)).toEqual([
       'json-formatter',
       'char-counter',
@@ -31,6 +31,7 @@ describe('ツール登録情報', () => {
       'color-tool',
       'checklist',
       'text-diff',
+      'markdown-preview',
     ])
   })
 })
