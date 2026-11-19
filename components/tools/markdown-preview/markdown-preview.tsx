@@ -2,12 +2,11 @@
 
 import type { ReactNode } from 'react'
 import { useDeferredValue, useId, useState, useSyncExternalStore } from 'react'
+import { SaveButton } from '@/components/save-button'
 import { loadDraft, saveDraft } from '@/lib/tools/markdown-preview'
 import { MarkdownView } from './markdown-view'
 import type { ViewMode } from './view-mode-switch'
 import { ViewModeSwitch } from './view-mode-switch'
-
-type SaveStatus = 'saved' | 'failed' | null
 
 const noopSubscribe = () => () => {}
 
@@ -34,42 +33,17 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
   const inputId = useId()
   const [markdown, setMarkdown] = useState(initialMarkdown)
   const [mode, setMode] = useState<ViewMode>('split')
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>(null)
   // 入力欄への反映は即時にし、プレビューの描画は後回しにできるようにする
   const deferredMarkdown = useDeferredValue(markdown)
-
-  function handleChange(value: string) {
-    setMarkdown(value)
-    setSaveStatus(null)
-  }
-
-  function handleSave() {
-    setSaveStatus(saveDraft(markdown) ? 'saved' : 'failed')
-  }
 
   const showEditor = mode !== 'preview'
   const showPreview = mode !== 'editor'
 
   // ボタン用の行は作らず、各欄の見出しの行に操作を置く（その分、欄を縦に広く使う）。
   // 保存は入力欄の見出しに、表示の切り替えはプレビューの見出しに置き、片方だけのときは見えている欄に両方を置く
+  // 保存の結果は、コピーボタンと同じくアイコンの切り替えと読み上げで伝える（SaveButton）
   const saveControls = (
-    <>
-      <p
-        aria-live="polite"
-        className="text-sm text-zinc-600 dark:text-zinc-400"
-      >
-        {saveStatus === 'saved' && '保存しました。'}
-        {saveStatus === 'failed' && '保存できませんでした。'}
-      </p>
-      <button
-        type="button"
-        onClick={handleSave}
-        disabled={!ready}
-        className="rounded-md bg-zinc-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-      >
-        保存
-      </button>
-    </>
+    <SaveButton onSave={() => saveDraft(markdown)} disabled={!ready} />
   )
   const modeSwitch = <ViewModeSwitch value={mode} onChange={setMode} />
 
@@ -98,7 +72,7 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
           <textarea
             id={inputId}
             value={markdown}
-            onChange={(e) => handleChange(e.target.value)}
+            onChange={(e) => setMarkdown(e.target.value)}
             disabled={!ready}
             spellCheck={false}
             className="h-150 w-full resize-none lg:h-auto lg:min-h-0 lg:flex-1 rounded-md border border-zinc-300 bg-transparent p-2 font-mono text-sm dark:border-zinc-700"

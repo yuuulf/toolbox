@@ -1,3 +1,5 @@
+import { IconButton } from '@/components/icon-button'
+import { TrashIcon } from '@/components/icons'
 import type { Favorites } from '@/lib/tools/color-favorites'
 import { MAX_FAVORITES } from '@/lib/tools/color-favorites'
 
@@ -56,26 +58,15 @@ export function FavoriteColors({
                 />
                 <span className="font-mono text-sm">{hex}</span>
               </button>
-              <button
-                type="button"
-                onClick={() => onRemove(hex)}
-                aria-label={`${hex} を削除`}
-                title={`${hex} を削除`}
-                className="rounded-r-md border-l border-zinc-300 p-2 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  aria-hidden="true"
-                  focusable="false"
-                  className="size-4"
-                >
-                  <path d="M6 6l12 12 M18 6L6 18" />
-                </svg>
-              </button>
+              {/* 色見本のボタンと1つのまとまりに見えるよう、境界線は外側に付ける */}
+              <span className="flex items-center self-stretch border-l border-zinc-300 px-1 dark:border-zinc-700">
+                <IconButton
+                  label={`${hex} を削除`}
+                  icon={<TrashIcon />}
+                  onClick={() => onRemove(hex)}
+                  variant="subtle"
+                />
+              </span>
             </li>
           ))}
         </ul>

@@ -2,6 +2,8 @@
 
 import type { FormEvent } from 'react'
 import { useId, useState } from 'react'
+import { IconButton } from '@/components/icon-button'
+import { PlusIcon } from '@/components/icons'
 import { MAX_ITEMS, MAX_TEXT_LENGTH } from '@/lib/tools/checklist'
 
 type Props = {
@@ -41,13 +43,12 @@ export function AddItemForm({ listLabel, itemCount, onAdd }: Props) {
           autoComplete="off"
           className="w-full min-w-0 rounded-md border border-zinc-300 bg-transparent px-2 py-1 text-sm dark:border-zinc-700"
         />
-        <button
+        <IconButton
           type="submit"
+          label="追加"
+          icon={<PlusIcon />}
           disabled={!canAdd}
-          className="shrink-0 rounded-md bg-zinc-900 px-3 py-1 text-sm font-semibold text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-        >
-          追加
-        </button>
+        />
       </div>
       <p
         aria-live="polite"

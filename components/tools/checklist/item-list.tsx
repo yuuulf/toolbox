@@ -1,3 +1,6 @@
+import { IconButton } from '@/components/icon-button'
+import { TrashIcon } from '@/components/icons'
+
 export type ItemView = { id: string; text: string; checked: boolean }
 
 type Props = {
@@ -38,26 +41,12 @@ export function ItemList({ items, onToggle, onRemove }: Props) {
               {item.text}
             </span>
           </label>
-          <button
-            type="button"
+          <IconButton
+            label={`${item.text} を削除`}
+            icon={<TrashIcon />}
             onClick={() => onRemove(item.id)}
-            aria-label={`${item.text} を削除`}
-            title={`${item.text} を削除`}
-            className="shrink-0 rounded p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              aria-hidden="true"
-              focusable="false"
-              className="size-4"
-            >
-              <path d="M6 6l12 12 M18 6L6 18" />
-            </svg>
-          </button>
+            variant="subtle"
+          />
         </li>
       ))}
     </ul>
