@@ -38,7 +38,7 @@ export function JsonFormatter() {
           id={inputId}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          rows={10}
+          rows={24}
           spellCheck={false}
           className="w-full rounded-md border border-zinc-300 bg-transparent p-2 font-mono text-sm dark:border-zinc-700"
         />
@@ -98,7 +98,7 @@ export function JsonFormatter() {
           id={outputId}
           value={output}
           readOnly
-          rows={10}
+          rows={24}
           spellCheck={false}
           className="w-full rounded-md border border-zinc-300 bg-zinc-50 p-2 font-mono text-sm dark:border-zinc-700 dark:bg-zinc-900"
         />

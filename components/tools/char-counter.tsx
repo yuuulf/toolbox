@@ -26,7 +26,7 @@ export function CharCounter() {
           id={inputId}
           value={text}
           onChange={(e) => setText(e.target.value)}
-          rows={10}
+          rows={24}
           className="w-full rounded-md border border-zinc-300 bg-transparent p-2 text-sm dark:border-zinc-700"
         />
       </div>

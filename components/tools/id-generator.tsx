@@ -15,6 +15,11 @@ import {
   UUID_COUNT_MIN,
 } from '@/lib/tools/id-generate'
 
+// UUID の生成結果の欄の行数。件数に合わせて伸ばし、上限を超えたら欄の中でスクロールする。
+// 上限は 1470×800 で縦スクロールが出ない高さ（100件を生成した状態で測って決めた）
+const UUID_ROWS_MIN = 3
+const UUID_ROWS_MAX = 20
+
 const CHARSET_LABELS: { key: CharsetKey; label: string }[] = [
   { key: 'upper', label: '英大文字（A-Z）' },
   { key: 'lower', label: '英小文字（a-z）' },
@@ -104,7 +109,7 @@ function UuidSection() {
           id={outputId}
           value={output}
           readOnly
-          rows={Math.min(Math.max(uuids.length, 3), 10)}
+          rows={Math.min(Math.max(uuids.length, UUID_ROWS_MIN), UUID_ROWS_MAX)}
           spellCheck={false}
           className="w-full rounded-md border border-zinc-300 bg-zinc-50 p-2 font-mono text-sm dark:border-zinc-700 dark:bg-zinc-900"
         />

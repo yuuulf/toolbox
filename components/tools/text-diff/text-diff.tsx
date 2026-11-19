@@ -54,7 +54,7 @@ export function TextDiff() {
             role="region"
             aria-label="比較結果"
             tabIndex={0}
-            className="relative max-h-64 overflow-y-auto rounded-md border border-zinc-300 dark:border-zinc-700"
+            className="relative max-h-88 overflow-y-auto rounded-md border border-zinc-300 dark:border-zinc-700"
           >
             <DiffView rows={result.rows} />
           </div>
@@ -90,7 +90,7 @@ function TextInput({ id, label, value, onChange }: TextInputProps) {
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        rows={8}
+        rows={10}
         spellCheck={false}
         className="w-full rounded-md border border-zinc-300 bg-transparent p-2 font-mono text-sm dark:border-zinc-700"
       />

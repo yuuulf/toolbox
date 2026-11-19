@@ -99,7 +99,7 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
             onChange={(e) => handleChange(e.target.value)}
             disabled={!ready}
             spellCheck={false}
-            className="h-118 w-full resize-none rounded-md border border-zinc-300 bg-transparent p-2 font-mono text-sm dark:border-zinc-700"
+            className="h-150 w-full resize-none rounded-md border border-zinc-300 bg-transparent p-2 font-mono text-sm dark:border-zinc-700"
           />
         </div>
       )}
@@ -118,7 +118,7 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
             role="region"
             aria-label="プレビュー"
             tabIndex={0}
-            className="relative h-118 overflow-y-auto rounded-md border border-zinc-300 p-3 dark:border-zinc-700"
+            className="relative h-150 overflow-y-auto rounded-md border border-zinc-300 p-3 dark:border-zinc-700"
           >
             <MarkdownView markdown={deferredMarkdown} />
           </div>
