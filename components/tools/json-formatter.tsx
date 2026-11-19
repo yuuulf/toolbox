@@ -23,17 +23,54 @@ export function JsonFormatter() {
 
   const output = result?.ok ? result.output : ''
 
-  // 広い画面では入力（と操作）を左の列、出力を右の列に並べ、どちらの欄も画面の下端まで広げる。
-  // DOM の順序（入力 → 操作 → 出力）は変えず、Tab の順を保つ
+  // 広い画面では入力を左の列、出力を右の列に並べ、どちらの欄も画面の下端まで広げる。
+  // 操作（インデント・整形・圧縮）は入力欄の見出しの行に置き、その分だけ欄を縦に広く使う（Markdownプレビューと同じ置き方）
   return (
     <div className="flex flex-col gap-4 lg:flex-1 lg:flex-row lg:gap-x-8">
-      <div className="flex min-w-0 flex-col gap-4 lg:flex-1 lg:basis-0">
+      {/* 結果の文がないときは高さ 0 にして、入力欄と出力欄の下端をそろえる（間隔は文のほうに付ける） */}
+      <div className="flex min-w-0 flex-col lg:flex-1 lg:basis-0">
         <div className="flex flex-col gap-1 lg:flex-1">
           {/* 出力欄の見出し行（コピーボタンあり）と高さをそろえ、2列のとき欄の上端を合わせる */}
-          <div className="flex min-h-9 items-center">
+          <div className="flex min-h-9 flex-wrap items-center justify-between gap-x-3 gap-y-1">
             <label htmlFor={inputId} className="text-sm font-medium">
               入力
             </label>
+            <div className="flex flex-wrap items-center gap-2">
+              <label htmlFor={indentId} className="text-sm font-medium">
+                インデント
+              </label>
+              <select
+                id={indentId}
+                value={indent.value}
+                onChange={(e) =>
+                  setIndent(
+                    INDENT_OPTIONS.find((o) => o.value === e.target.value) ??
+                      DEFAULT_INDENT,
+                  )
+                }
+                className="rounded-md border border-zinc-300 bg-transparent px-2 py-1 text-sm dark:border-zinc-700"
+              >
+                {INDENT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => setResult(formatJson(input, indent.indent))}
+                className="rounded-md bg-zinc-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+              >
+                整形
+              </button>
+              <button
+                type="button"
+                onClick={() => setResult(minifyJson(input))}
+                className="rounded-md border border-zinc-300 px-4 py-1.5 text-sm font-semibold hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+              >
+                圧縮
+              </button>
+            </div>
           </div>
           <textarea
             id={inputId}
@@ -44,45 +81,6 @@ export function JsonFormatter() {
             // rows の高さを最低にして、残りの高さを埋める
             className="w-full rounded-md border border-zinc-300 bg-transparent p-2 font-mono text-sm lg:flex-1 dark:border-zinc-700"
           />
-        </div>
-
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="flex flex-col gap-1">
-            <label htmlFor={indentId} className="text-sm font-medium">
-              インデント
-            </label>
-            <select
-              id={indentId}
-              value={indent.value}
-              onChange={(e) =>
-                setIndent(
-                  INDENT_OPTIONS.find((o) => o.value === e.target.value) ??
-                    DEFAULT_INDENT,
-                )
-              }
-              className="rounded-md border border-zinc-300 bg-transparent px-2 py-1 text-sm dark:border-zinc-700"
-            >
-              {INDENT_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button
-            type="button"
-            onClick={() => setResult(formatJson(input, indent.indent))}
-            className="rounded-md bg-zinc-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-          >
-            整形
-          </button>
-          <button
-            type="button"
-            onClick={() => setResult(minifyJson(input))}
-            className="rounded-md border border-zinc-300 px-4 py-1.5 text-sm font-semibold hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-          >
-            圧縮
-          </button>
         </div>
 
         <div aria-live="polite">
@@ -114,7 +112,7 @@ function ResultMessage({ result }: { result: JsonResult | null }) {
   if (result === null || result.ok) return null
   if (result.kind === 'empty') {
     return (
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
         JSON を入力してください。
       </p>
     )
@@ -124,7 +122,7 @@ function ResultMessage({ result }: { result: JsonResult | null }) {
       ? `（${result.line}行目 ${result.column}列目）`
       : ''
   return (
-    <p className="text-sm text-red-700 dark:text-red-400">
+    <p className="mt-3 text-sm text-red-700 dark:text-red-400">
       エラー: JSON の構文が正しくありません{position}。
       <span className="block font-mono text-xs">{result.error}</span>
     </p>

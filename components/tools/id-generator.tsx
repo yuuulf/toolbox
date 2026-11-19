@@ -15,10 +15,9 @@ import {
   UUID_COUNT_MIN,
 } from '@/lib/tools/id-generate'
 
-// UUID の生成結果の欄の行数。件数に合わせて伸ばし、上限を超えたら欄の中でスクロールする。
-// 上限は 1470×800 で縦スクロールが出ない高さ（100件を生成した状態で測って決めた）
-const UUID_ROWS_MIN = 3
-const UUID_ROWS_MAX = 20
+// UUID の生成結果の欄は、件数の行数（初期表示と1件のときは1行）にして、件数に合わせて伸ばす。
+// 伸びる上限は、1024px 未満では 20行分（max-h-105）、広い画面では画面の残りの高さ（20行分が最低）
+const UUID_ROWS_MIN = 1
 
 const CHARSET_LABELS: { key: CharsetKey; label: string }[] = [
   { key: 'upper', label: '英大文字（A-Z）' },
@@ -100,7 +99,9 @@ function UuidSection() {
           ? ''
           : `個数は ${UUID_COUNT_MIN}〜${UUID_COUNT_MAX} の範囲で指定してください。`}
       </p>
-      <div className="flex flex-col gap-1">
+      {/* 広い画面では、この枠を結果の行の高さまで広げ、欄は中身（件数）の高さのまま枠の高さまで伸ばす。
+          contain-size で枠が中身の高さに引っ張られないようにし、最低の高さ（見出しの行 + 20行分）は枠に付ける */}
+      <div className="flex flex-col gap-1 lg:min-h-114 lg:contain-size">
         <div className="flex items-center justify-between gap-2">
           <label htmlFor={outputId} className="text-sm font-medium">
             生成結果
@@ -111,10 +112,9 @@ function UuidSection() {
           id={outputId}
           value={output}
           readOnly
-          rows={Math.min(Math.max(uuids.length, UUID_ROWS_MIN), UUID_ROWS_MAX)}
+          rows={Math.max(uuids.length, UUID_ROWS_MIN)}
           spellCheck={false}
-          // rows の高さを最低にして、広い画面では結果の行の残りの高さを埋める
-          className="w-full rounded-md border border-zinc-300 bg-zinc-50 p-2 font-mono text-sm lg:flex-1 dark:border-zinc-700 dark:bg-zinc-900"
+          className="max-h-105 w-full rounded-md border border-zinc-300 bg-zinc-50 p-2 font-mono text-sm lg:max-h-none lg:min-h-0 dark:border-zinc-700 dark:bg-zinc-900"
         />
       </div>
     </section>
