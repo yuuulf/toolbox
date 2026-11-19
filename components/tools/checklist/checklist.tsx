@@ -81,11 +81,14 @@ export function Checklist() {
 
   return (
     // 1470×800 に収めるため、xl では4列に並べる（各リストの一覧は中でスクロールする）
-    <div className="grid gap-8 lg:grid-cols-2 lg:gap-x-6 xl:grid-cols-4">
+    <div className="grid gap-8 lg:min-h-0 lg:flex-1 lg:grid-cols-2 lg:gap-x-6 xl:grid-cols-4">
       {today === null
         ? // プリレンダーした HTML では日付が決まらないので、見出しだけの枠を出す
           (Object.keys(LIST_TITLES) as ListKind[]).map((list) => (
-            <section key={list} className="flex flex-col gap-3">
+            <section
+              key={list}
+              className="flex flex-col gap-3 lg:min-h-159 lg:contain-size"
+            >
               <h2 className="text-lg font-semibold">{LIST_TITLES[list]}</h2>
             </section>
           ))

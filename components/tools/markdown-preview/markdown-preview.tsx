@@ -74,16 +74,18 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
   const modeSwitch = <ViewModeSwitch value={mode} onChange={setMode} />
 
   return (
-    // 並べて表示は lg 以上で左右に、それ未満では縦に並べる。片方だけのときは幅いっぱいに使う
+    // 並べて表示は lg 以上で左右に、それ未満では縦に並べる。片方だけのときは幅いっぱいに使う。
+    // lg 以上では欄を画面の下端まで広げる。プレビューは中身に合わせて伸びる箱なので、各欄の枠に contain-size と
+    // 最低の高さ（見出しの行 36px + 間隔 4px + h-150 の 600px = 640px）を付け、中身の高さで枠が伸びないようにする
     <div
       className={
         mode === 'split'
-          ? 'flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-x-6'
-          : 'flex flex-col'
+          ? 'flex flex-col gap-4 lg:grid lg:flex-1 lg:grid-cols-2 lg:gap-x-6'
+          : 'flex flex-col lg:flex-1'
       }
     >
       {showEditor && (
-        <div className="flex min-w-0 flex-col gap-1">
+        <div className="flex min-w-0 flex-col gap-1 lg:min-h-160 lg:flex-1 lg:contain-size">
           <PaneHeader>
             <label htmlFor={inputId} className="text-sm font-medium">
               Markdown
@@ -99,12 +101,12 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
             onChange={(e) => handleChange(e.target.value)}
             disabled={!ready}
             spellCheck={false}
-            className="h-150 w-full resize-none rounded-md border border-zinc-300 bg-transparent p-2 font-mono text-sm dark:border-zinc-700"
+            className="h-150 w-full resize-none lg:h-auto lg:min-h-0 lg:flex-1 rounded-md border border-zinc-300 bg-transparent p-2 font-mono text-sm dark:border-zinc-700"
           />
         </div>
       )}
       {showPreview && (
-        <div className="flex min-w-0 flex-col gap-1">
+        <div className="flex min-w-0 flex-col gap-1 lg:min-h-160 lg:flex-1 lg:contain-size">
           <PaneHeader>
             <h2 className="text-sm font-medium">プレビュー</h2>
             <div className="flex flex-wrap items-center justify-end gap-3">
@@ -118,7 +120,7 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
             role="region"
             aria-label="プレビュー"
             tabIndex={0}
-            className="relative h-150 overflow-y-auto rounded-md border border-zinc-300 p-3 dark:border-zinc-700"
+            className="relative h-150 overflow-y-auto lg:h-auto lg:min-h-0 lg:flex-1 rounded-md border border-zinc-300 p-3 dark:border-zinc-700"
           >
             <MarkdownView markdown={deferredMarkdown} />
           </div>

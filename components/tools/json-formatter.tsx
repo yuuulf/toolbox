@@ -23,71 +23,74 @@ export function JsonFormatter() {
 
   const output = result?.ok ? result.output : ''
 
-  // 広い画面では入力（と操作）を左、出力を右に並べ、1画面に収める。
+  // 広い画面では入力（と操作）を左の列、出力を右の列に並べ、どちらの欄も画面の下端まで広げる。
   // DOM の順序（入力 → 操作 → 出力）は変えず、Tab の順を保つ
   return (
-    <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
-      <div className="flex flex-col gap-1 lg:col-start-1">
-        {/* 出力欄の見出し行（コピーボタンあり）と高さをそろえ、2列のとき欄の上端を合わせる */}
-        <div className="flex min-h-9 items-center">
-          <label htmlFor={inputId} className="text-sm font-medium">
-            入力
-          </label>
+    <div className="flex flex-col gap-4 lg:flex-1 lg:flex-row lg:gap-x-8">
+      <div className="flex min-w-0 flex-col gap-4 lg:flex-1 lg:basis-0">
+        <div className="flex flex-col gap-1 lg:flex-1">
+          {/* 出力欄の見出し行（コピーボタンあり）と高さをそろえ、2列のとき欄の上端を合わせる */}
+          <div className="flex min-h-9 items-center">
+            <label htmlFor={inputId} className="text-sm font-medium">
+              入力
+            </label>
+          </div>
+          <textarea
+            id={inputId}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            rows={24}
+            spellCheck={false}
+            // rows の高さを最低にして、残りの高さを埋める
+            className="w-full rounded-md border border-zinc-300 bg-transparent p-2 font-mono text-sm lg:flex-1 dark:border-zinc-700"
+          />
         </div>
-        <textarea
-          id={inputId}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          rows={24}
-          spellCheck={false}
-          className="w-full rounded-md border border-zinc-300 bg-transparent p-2 font-mono text-sm dark:border-zinc-700"
-        />
-      </div>
 
-      <div className="flex flex-wrap items-end gap-3 lg:col-start-1">
-        <div className="flex flex-col gap-1">
-          <label htmlFor={indentId} className="text-sm font-medium">
-            インデント
-          </label>
-          <select
-            id={indentId}
-            value={indent.value}
-            onChange={(e) =>
-              setIndent(
-                INDENT_OPTIONS.find((o) => o.value === e.target.value) ??
-                  DEFAULT_INDENT,
-              )
-            }
-            className="rounded-md border border-zinc-300 bg-transparent px-2 py-1 text-sm dark:border-zinc-700"
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="flex flex-col gap-1">
+            <label htmlFor={indentId} className="text-sm font-medium">
+              インデント
+            </label>
+            <select
+              id={indentId}
+              value={indent.value}
+              onChange={(e) =>
+                setIndent(
+                  INDENT_OPTIONS.find((o) => o.value === e.target.value) ??
+                    DEFAULT_INDENT,
+                )
+              }
+              className="rounded-md border border-zinc-300 bg-transparent px-2 py-1 text-sm dark:border-zinc-700"
+            >
+              {INDENT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            type="button"
+            onClick={() => setResult(formatJson(input, indent.indent))}
+            className="rounded-md bg-zinc-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
           >
-            {INDENT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            整形
+          </button>
+          <button
+            type="button"
+            onClick={() => setResult(minifyJson(input))}
+            className="rounded-md border border-zinc-300 px-4 py-1.5 text-sm font-semibold hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          >
+            圧縮
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => setResult(formatJson(input, indent.indent))}
-          className="rounded-md bg-zinc-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-        >
-          整形
-        </button>
-        <button
-          type="button"
-          onClick={() => setResult(minifyJson(input))}
-          className="rounded-md border border-zinc-300 px-4 py-1.5 text-sm font-semibold hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-        >
-          圧縮
-        </button>
+
+        <div aria-live="polite">
+          <ResultMessage result={result} />
+        </div>
       </div>
 
-      <div aria-live="polite" className="lg:col-start-1">
-        <ResultMessage result={result} />
-      </div>
-
-      <div className="flex flex-col gap-1 lg:col-start-2 lg:row-span-3 lg:row-start-1">
+      <div className="flex min-w-0 flex-col gap-1 lg:flex-1 lg:basis-0">
         <div className="flex min-h-9 items-center justify-between gap-2">
           <label htmlFor={outputId} className="text-sm font-medium">
             出力
@@ -100,7 +103,7 @@ export function JsonFormatter() {
           readOnly
           rows={24}
           spellCheck={false}
-          className="w-full rounded-md border border-zinc-300 bg-zinc-50 p-2 font-mono text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className="w-full rounded-md border border-zinc-300 bg-zinc-50 p-2 font-mono text-sm lg:flex-1 dark:border-zinc-700 dark:bg-zinc-900"
         />
       </div>
     </div>

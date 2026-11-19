@@ -20,7 +20,7 @@ export function TextDiff() {
   const message = resultMessage(result)
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 lg:min-h-0 lg:flex-1">
       <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-x-6">
         <TextInput
           id={beforeId}
@@ -35,7 +35,9 @@ export function TextDiff() {
           onChange={setAfter}
         />
       </div>
-      <div className="flex flex-col gap-2">
+      {/* 広い画面では、この枠を画面の下端まで広げ、比較結果は中身の高さのまま枠の高さまで伸ばす。
+          最低の高さ（見出しの行 + max-h-88）は枠に付ける。欄に付けると短い結果でも欄が大きくなるため */}
+      <div className="flex flex-col gap-2 lg:min-h-95 lg:flex-1 lg:contain-size">
         {/* 案内は見出しと同じ行に出し、結果欄の上に空の行を作らない */}
         <div className="flex flex-wrap items-baseline gap-x-3">
           <h2 className="text-sm font-medium">比較結果</h2>
@@ -54,7 +56,7 @@ export function TextDiff() {
             role="region"
             aria-label="比較結果"
             tabIndex={0}
-            className="relative max-h-88 overflow-y-auto rounded-md border border-zinc-300 dark:border-zinc-700"
+            className="relative max-h-88 overflow-y-auto rounded-md lg:max-h-none lg:min-h-0 border border-zinc-300 dark:border-zinc-700"
           >
             <DiffView rows={result.rows} />
           </div>

@@ -66,7 +66,9 @@ export function RecurringList({
   }))
 
   return (
-    <section className="flex flex-col gap-3">
+    // 広い画面では、30件のときの高さ（一覧が max-h-112）を最低にして、画面の下端まで広がる。
+    // 一覧はこの中で中身の高さのまま伸び、追加の入力欄は一覧のすぐ下に来る
+    <section className="flex flex-col gap-3 lg:min-h-159 lg:contain-size">
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="text-lg font-semibold">{title}</h2>
         <CompletionCount

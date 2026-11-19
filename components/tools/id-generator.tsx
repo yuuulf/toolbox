@@ -38,7 +38,9 @@ export function IdGenerator() {
   // 各セクションを4行（見出し・入力欄とボタン・補足・結果欄）の subgrid にして、左右で行の高さを共有し、
   // 入力欄・ボタン・結果欄の位置をそろえる
   return (
-    <div className="flex flex-col gap-10 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-3">
+    // 広い画面では、2つの列の行（見出し・操作・メッセージ・結果）をそろえ、最後の結果の行を画面の下端まで広げる。
+    // 「最後の行だけ残りの高さ」という行の組み方は Tailwind の既定のクラスにないので、行の指定だけ任意値で書く
+    <div className="flex flex-col gap-10 lg:grid lg:flex-1 lg:grid-cols-2 lg:grid-rows-[auto_auto_auto_1fr] lg:gap-x-8 lg:gap-y-3">
       <UuidSection />
       <PasswordSection />
     </div>
@@ -111,7 +113,8 @@ function UuidSection() {
           readOnly
           rows={Math.min(Math.max(uuids.length, UUID_ROWS_MIN), UUID_ROWS_MAX)}
           spellCheck={false}
-          className="w-full rounded-md border border-zinc-300 bg-zinc-50 p-2 font-mono text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          // rows の高さを最低にして、広い画面では結果の行の残りの高さを埋める
+          className="w-full rounded-md border border-zinc-300 bg-zinc-50 p-2 font-mono text-sm lg:flex-1 dark:border-zinc-700 dark:bg-zinc-900"
         />
       </div>
     </section>
