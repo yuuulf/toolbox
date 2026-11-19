@@ -44,8 +44,11 @@ app/                      # ルーティングと Next.js 規約ファイルの�
   globals.css
   tools/[slug]/page.tsx   # 各ツールのページ
 components/               # React コンポーネント
-  header.tsx              # 複数ページで使う共通 UI
-  tool-nav.tsx
+  sidebar.tsx             # 複数ページで使う共通 UI。幅 1024px 以上の左のサイドバー
+  mobile-header.tsx       # 幅 1024px 未満の上部のバー
+  mobile-menu.tsx         # 上部のバーのメニュー（<dialog>）
+  brand-link.tsx          # アプリ名とアイコンのトップへのリンク
+  tool-nav.tsx            # ツール一覧のナビゲーション（サイドバーとメニューで共通）
   copy-button.tsx
   tools/                  # ツール固有の UI
     registry.ts           # ツール登録情報（一覧・ナビ・ルートの唯一の情報源。UI を参照するためここに置く）

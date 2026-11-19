@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import { Suspense } from 'react'
-import { Header } from '@/components/header'
-import { ToolNav, ToolNavList } from '@/components/tool-nav'
+import { MobileHeader } from '@/components/mobile-header'
+import { Sidebar } from '@/components/sidebar'
 import { tools } from '@/components/tools/registry'
 import { BASE_PATH } from '@/lib/base-path'
 import './globals.css'
@@ -34,14 +33,12 @@ const navItems = tools.map(({ slug, name }) => ({ slug, name }))
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="ja" className="h-full antialiased">
-      <body className="flex min-h-full flex-col bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-        <Header />
-        {/* static export ではビルド時に URL が決まるため usePathname は中断しないが、
-            サーバーで描画する構成に戻したときに備えて、現在地の強調なしのナビをフォールバックに残す */}
-        <Suspense fallback={<ToolNavList items={navItems} />}>
-          <ToolNav items={navItems} />
-        </Suspense>
-        {children}
+      {/* 幅 1024px 以上は左のサイドバーとメインを横に、それ未満は上部のバーとメインを縦に並べる */}
+      <body className="flex min-h-full flex-col bg-white text-zinc-900 lg:flex-row dark:bg-zinc-950 dark:text-zinc-100">
+        <Sidebar items={navItems} />
+        <MobileHeader items={navItems} />
+        {/* 各ページの main は、この中で今までどおり最大幅 1024px で中央に寄せる */}
+        <div className="flex min-w-0 flex-1 flex-col">{children}</div>
       </body>
     </html>
   )

@@ -17,8 +17,9 @@ export function CharCounter() {
   const counts = countText(text)
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-4 lg:flex-1">
+      {/* 広い画面では入力欄を画面の下端まで広げる（rows の高さが最低） */}
+      <div className="flex flex-col gap-1 lg:flex-1">
         <label htmlFor={inputId} className="text-sm font-medium">
           テキスト
         </label>
@@ -26,8 +27,8 @@ export function CharCounter() {
           id={inputId}
           value={text}
           onChange={(e) => setText(e.target.value)}
-          rows={10}
-          className="w-full rounded-md border border-zinc-300 bg-transparent p-2 text-sm dark:border-zinc-700"
+          rows={24}
+          className="w-full rounded-md border border-zinc-300 bg-transparent p-2 text-sm lg:flex-1 dark:border-zinc-700"
         />
       </div>
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">

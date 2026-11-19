@@ -15,9 +15,10 @@ export function ItemList({ items, onToggle, onRemove }: Props) {
     )
   }
 
-  // 1画面に収めるため、項目が多いときは一覧の中でスクロールさせる
+  // 1画面に収めるため、項目が多いときは一覧の中でスクロールさせる。
+  // 広い画面では、中身の高さのまま、リストの枠（section）の残りの高さまで伸びる
   return (
-    <ul className="flex max-h-72 flex-col gap-1 overflow-y-auto">
+    <ul className="flex max-h-112 flex-col gap-1 overflow-y-auto lg:max-h-none lg:min-h-0">
       {items.map((item) => (
         <li key={item.id} className="flex items-start gap-2">
           <label className="flex min-w-0 flex-1 items-start gap-2 py-0.5 text-sm">

@@ -43,6 +43,21 @@ describe('UUID', () => {
     for (const line of lines) expect(line).toMatch(UUID_V4)
   })
 
+  it('生成結果の欄は、初期表示と1件のときは1行で、件数に合わせて行が増える', async () => {
+    const { user } = await setup()
+    const output = screen.getByLabelText('生成結果') as HTMLTextAreaElement
+    expect(output.rows).toBe(1)
+
+    await user.click(screen.getByRole('button', { name: 'UUID を生成' }))
+    expect(output.rows).toBe(1)
+
+    const count = screen.getByLabelText('個数')
+    await user.clear(count)
+    await user.type(count, '5')
+    await user.click(screen.getByRole('button', { name: 'UUID を生成' }))
+    expect(output.rows).toBe(5)
+  })
+
   it('範囲外の個数では生成できず、範囲を案内する', async () => {
     const { user } = await setup()
     const count = screen.getByLabelText('個数')

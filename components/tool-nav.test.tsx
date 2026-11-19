@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { usePathname } from 'next/navigation'
 import { describe, expect, it, vi } from 'vitest'
 import { ToolNav } from './tool-nav'
@@ -41,6 +41,15 @@ describe('ToolNav', () => {
     ).not.toHaveAttribute('aria-current')
   })
 
+  it('末尾に / が付いたパスでも現在地として強調する', () => {
+    vi.mocked(usePathname).mockReturnValue('/tools/id-generator/')
+    render(<ToolNav items={items} />)
+
+    expect(
+      screen.getByRole('link', { name: 'UUID/パスワード生成' }),
+    ).toHaveAttribute('aria-current', 'page')
+  })
+
   it('トップページではどのツールも強調しない', () => {
     vi.mocked(usePathname).mockReturnValue('/')
     render(<ToolNav items={items} />)
@@ -48,5 +57,14 @@ describe('ToolNav', () => {
     for (const link of screen.getAllByRole('link')) {
       expect(link).not.toHaveAttribute('aria-current')
     }
+  })
+
+  it('リンクを押すと onNavigate を呼ぶ', async () => {
+    vi.mocked(usePathname).mockReturnValue('/')
+    const onNavigate = vi.fn()
+    render(<ToolNav items={items} onNavigate={onNavigate} />)
+    // jsdom は遷移しないので、クリックで呼ばれることだけを確かめる
+    fireEvent.click(screen.getByRole('link', { name: '文字数カウント' }))
+    expect(onNavigate).toHaveBeenCalledTimes(1)
   })
 })

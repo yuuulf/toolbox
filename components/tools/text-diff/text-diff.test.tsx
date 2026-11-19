@@ -65,7 +65,7 @@ describe('TextDiff', () => {
     })
     const region = await screen.findByRole('region', { name: '比較結果' })
     expect(region.className.split(' ')).toEqual(
-      expect.arrayContaining(['relative', 'max-h-64', 'overflow-y-auto']),
+      expect.arrayContaining(['relative', 'max-h-88', 'overflow-y-auto']),
     )
   })
 

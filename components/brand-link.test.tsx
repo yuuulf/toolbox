@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { Header } from './header'
+import { BrandLink } from './brand-link'
 
-describe('Header', () => {
+describe('BrandLink', () => {
   it('トップへのリンクは「toolbox」と読み上げられ、アイコンは読み上げ対象にならない', () => {
-    render(<Header />)
+    render(<BrandLink />)
     const link = screen.getByRole('link', { name: 'toolbox' })
     expect(link.getAttribute('href')).toBe('/')
     // alt="" の画像は presentation 扱いになり、img ロールとしては取得できない
@@ -13,7 +13,7 @@ describe('Header', () => {
   })
 
   it('リンクの中に、OS のライト/ダーク設定で切り替わるアイコンが2枚ある', () => {
-    render(<Header />)
+    render(<BrandLink />)
     const icons = screen.getByRole('link').querySelectorAll('img')
     expect(icons).toHaveLength(2)
     const [light, dark] = icons
@@ -28,7 +28,7 @@ describe('Header', () => {
   })
 
   it('ポインタを重ねても下線を出さない', () => {
-    render(<Header />)
+    render(<BrandLink />)
     expect(screen.getByRole('link').className).not.toContain('underline')
   })
 })
