@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useDeferredValue, useId, useState, useSyncExternalStore } from 'react'
 import { loadDraft, saveDraft } from '@/lib/tools/markdown-preview'
 import { MarkdownView } from './markdown-view'
@@ -49,66 +50,88 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
   const showEditor = mode !== 'preview'
   const showPreview = mode !== 'editor'
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <ViewModeSwitch value={mode} onChange={setMode} />
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={!ready}
-          className="rounded-md bg-zinc-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-        >
-          保存
-        </button>
-        <p
-          aria-live="polite"
-          className="text-sm text-zinc-600 dark:text-zinc-400"
-        >
-          {saveStatus === 'saved' && '保存しました。'}
-          {saveStatus === 'failed' && '保存できませんでした。'}
-        </p>
-      </div>
-
-      {/* 並べて表示は lg 以上で左右に、それ未満では縦に並べる。片方だけのときは幅いっぱいに使う */}
-      <div
-        className={
-          mode === 'split'
-            ? 'flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-x-6'
-            : 'flex flex-col'
-        }
+  // ボタン用の行は作らず、各欄の見出しの行に操作を置く（その分、欄を縦に広く使う）。
+  // 保存は入力欄の見出しに、表示の切り替えはプレビューの見出しに置き、片方だけのときは見えている欄に両方を置く
+  const saveControls = (
+    <>
+      <p
+        aria-live="polite"
+        className="text-sm text-zinc-600 dark:text-zinc-400"
       >
-        {showEditor && (
-          <div className="flex min-w-0 flex-col gap-1">
+        {saveStatus === 'saved' && '保存しました。'}
+        {saveStatus === 'failed' && '保存できませんでした。'}
+      </p>
+      <button
+        type="button"
+        onClick={handleSave}
+        disabled={!ready}
+        className="rounded-md bg-zinc-900 px-4 py-1.5 text-sm font-semibold text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+      >
+        保存
+      </button>
+    </>
+  )
+  const modeSwitch = <ViewModeSwitch value={mode} onChange={setMode} />
+
+  return (
+    // 並べて表示は lg 以上で左右に、それ未満では縦に並べる。片方だけのときは幅いっぱいに使う
+    <div
+      className={
+        mode === 'split'
+          ? 'flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-x-6'
+          : 'flex flex-col'
+      }
+    >
+      {showEditor && (
+        <div className="flex min-w-0 flex-col gap-1">
+          <PaneHeader>
             <label htmlFor={inputId} className="text-sm font-medium">
               Markdown
             </label>
-            <textarea
-              id={inputId}
-              value={markdown}
-              onChange={(e) => handleChange(e.target.value)}
-              disabled={!ready}
-              spellCheck={false}
-              className="h-108 w-full resize-none rounded-md border border-zinc-300 bg-transparent p-2 font-mono text-sm dark:border-zinc-700"
-            />
-          </div>
-        )}
-        {showPreview && (
-          <div className="flex min-w-0 flex-col gap-1">
-            <h2 className="text-sm font-medium">プレビュー</h2>
-            {/* 長いプレビューはこの欄の中でスクロールする。キーボードでもスクロールできるようフォーカス可能にする。
-                relative は、中の sr-only などの絶対配置がこの欄の外へはみ出してページを伸ばさないため */}
-            <div
-              role="region"
-              aria-label="プレビュー"
-              tabIndex={0}
-              className="relative h-108 overflow-y-auto rounded-md border border-zinc-300 p-3 dark:border-zinc-700"
-            >
-              <MarkdownView markdown={deferredMarkdown} />
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              {saveControls}
+              {mode === 'editor' && modeSwitch}
             </div>
+          </PaneHeader>
+          <textarea
+            id={inputId}
+            value={markdown}
+            onChange={(e) => handleChange(e.target.value)}
+            disabled={!ready}
+            spellCheck={false}
+            className="h-118 w-full resize-none rounded-md border border-zinc-300 bg-transparent p-2 font-mono text-sm dark:border-zinc-700"
+          />
+        </div>
+      )}
+      {showPreview && (
+        <div className="flex min-w-0 flex-col gap-1">
+          <PaneHeader>
+            <h2 className="text-sm font-medium">プレビュー</h2>
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              {mode === 'preview' && saveControls}
+              {modeSwitch}
+            </div>
+          </PaneHeader>
+          {/* 長いプレビューはこの欄の中でスクロールする。キーボードでもスクロールできるようフォーカス可能にする。
+              relative は、中の sr-only などの絶対配置がこの欄の外へはみ出してページを伸ばさないため */}
+          <div
+            role="region"
+            aria-label="プレビュー"
+            tabIndex={0}
+            className="relative h-118 overflow-y-auto rounded-md border border-zinc-300 p-3 dark:border-zinc-700"
+          >
+            <MarkdownView markdown={deferredMarkdown} />
           </div>
-        )}
-      </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PaneHeader({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex min-h-9 flex-wrap items-center justify-between gap-x-3 gap-y-1">
+      {children}
     </div>
   )
 }

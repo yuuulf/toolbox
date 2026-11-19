@@ -58,6 +58,16 @@ describe('MarkdownPreview', () => {
     expect(preview()).toBeTruthy()
   })
 
+  it('どの表示でも、保存ボタンと表示の切り替えを使える', async () => {
+    const user = userEvent.setup()
+    render(<MarkdownPreview />)
+    for (const name of ['入力のみ', 'プレビューのみ', '並べて表示']) {
+      await user.click(screen.getByRole('radio', { name }))
+      expect(screen.getByRole('button', { name: '保存' })).toBeTruthy()
+      expect(screen.getByRole('radiogroup', { name: '表示' })).toBeTruthy()
+    }
+  })
+
   it('入力しただけでは保存しない', () => {
     const setItem = vi.spyOn(Storage.prototype, 'setItem')
     render(<MarkdownPreview />)
