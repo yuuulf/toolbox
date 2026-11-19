@@ -2,11 +2,14 @@
 
 import type { ReactNode } from 'react'
 import { useDeferredValue, useId, useState, useSyncExternalStore } from 'react'
-import { SaveButton } from '@/components/save-button'
 import { loadDraft, saveDraft } from '@/lib/tools/markdown-preview'
 import { MarkdownView } from './markdown-view'
 import type { ViewMode } from './view-mode-switch'
 import { ViewModeSwitch } from './view-mode-switch'
+import { useAutoSave } from './use-auto-save'
+
+const AUTOSAVE_FAILED_MESSAGE =
+  '自動保存できません。再読み込みすると入力が消えます。'
 
 const noopSubscribe = () => () => {}
 
@@ -25,7 +28,7 @@ export function MarkdownPreview() {
 
 type EditorProps = {
   initialMarkdown: string
-  /** 保存値を読み終えたか。読み終えるまでは入力と保存をできなくする */
+  /** 保存値を読み終えたか。読み終えるまでは入力と自動保存をしない */
   ready: boolean
 }
 
@@ -35,15 +38,18 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
   const [mode, setMode] = useState<ViewMode>('split')
   // 入力欄への反映は即時にし、プレビューの描画は後回しにできるようにする
   const deferredMarkdown = useDeferredValue(markdown)
+  const saveFailed = useAutoSave(markdown, ready, saveDraft)
 
   const showEditor = mode !== 'preview'
   const showPreview = mode !== 'editor'
 
   // ボタン用の行は作らず、各欄の見出しの行に操作を置く（その分、欄を縦に広く使う）。
-  // 保存は入力欄の見出しに、表示の切り替えはプレビューの見出しに置き、片方だけのときは見えている欄に両方を置く
-  // 保存の結果は、コピーボタンと同じくアイコンの切り替えと読み上げで伝える（SaveButton）
-  const saveControls = (
-    <SaveButton onSave={() => saveDraft(markdown)} disabled={!ready} />
+  // 自動保存できないときの文言は入力欄の見出しに、表示の切り替えはプレビューの見出しに置き、片方だけのときは見えている欄に両方を置く。
+  // 文言の領域は、後から文字が入ったときに読み上げられるよう、失敗していないときも空のまま置く
+  const saveStatus = (
+    <p aria-live="polite" className="text-sm text-red-700 dark:text-red-400">
+      {saveFailed ? AUTOSAVE_FAILED_MESSAGE : ''}
+    </p>
   )
   const modeSwitch = <ViewModeSwitch value={mode} onChange={setMode} />
 
@@ -65,7 +71,7 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
               Markdown
             </label>
             <div className="flex flex-wrap items-center justify-end gap-3">
-              {saveControls}
+              {saveStatus}
               {mode === 'editor' && modeSwitch}
             </div>
           </PaneHeader>
@@ -84,7 +90,7 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
           <PaneHeader>
             <h2 className="text-sm font-medium">プレビュー</h2>
             <div className="flex flex-wrap items-center justify-end gap-3">
-              {mode === 'preview' && saveControls}
+              {mode === 'preview' && saveStatus}
               {modeSwitch}
             </div>
           </PaneHeader>
