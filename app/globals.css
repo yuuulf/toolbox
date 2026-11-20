@@ -1,5 +1,13 @@
 @import 'tailwindcss';
 
+/* アクセント色は #009688 を基準にする。Tailwind 既定の teal は色相・明るさが違うため独自に定義する。
+   白背景の文字には AA（4.5:1）を満たす 700、暗い背景には 300 を使い、500 は文字以外の部品に使う */
+@theme {
+  --color-accent-300: #4db6ac;
+  --color-accent-500: #009688;
+  --color-accent-700: #00796b;
+}
+
 /* フォーム部品やスクロールバーも OS のライト/ダーク設定に追従させる */
 :root {
   color-scheme: light dark;
