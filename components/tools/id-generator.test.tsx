@@ -16,8 +16,10 @@ async function setup() {
   return { user }
 }
 
-const passwordOutput = () =>
-  screen.getByLabelText('生成したパスワード') as HTMLInputElement
+const passwordText = () =>
+  screen.getByRole('region', { name: '生成したパスワード' }).textContent ?? ''
+const uuidText = () =>
+  screen.getByRole('region', { name: '生成結果' }).textContent ?? ''
 
 beforeEach(() => {
   localStorage.clear()
@@ -35,27 +37,32 @@ describe('UUID', () => {
     await user.type(count, '5')
     await user.click(screen.getByRole('button', { name: 'UUID を生成' }))
 
-    const lines = (
-      screen.getByLabelText('生成結果') as HTMLTextAreaElement
-    ).value.split('\n')
+    const lines = uuidText().split('\n')
     expect(lines).toHaveLength(5)
     expect(new Set(lines).size).toBe(5)
     for (const line of lines) expect(line).toMatch(UUID_V4)
   })
 
-  it('生成結果の欄は、初期表示と1件のときは1行で、件数に合わせて行が増える', async () => {
+  it('生成結果は1行に1件ずつ表示し、初期表示と1件のときは1行になる', async () => {
     const { user } = await setup()
-    const output = screen.getByLabelText('生成結果') as HTMLTextAreaElement
-    expect(output.rows).toBe(1)
+    expect(uuidText().split('\n')).toHaveLength(1)
 
     await user.click(screen.getByRole('button', { name: 'UUID を生成' }))
-    expect(output.rows).toBe(1)
+    expect(uuidText().split('\n')).toHaveLength(1)
 
     const count = screen.getByLabelText('個数')
     await user.clear(count)
     await user.type(count, '5')
     await user.click(screen.getByRole('button', { name: 'UUID を生成' }))
-    expect(output.rows).toBe(5)
+    expect(uuidText().split('\n')).toHaveLength(5)
+  })
+
+  it('生成結果とパスワードは編集できるテキスト欄ではなく、表示欄で表示する', async () => {
+    await setup()
+    for (const name of ['生成結果', '生成したパスワード']) {
+      expect(screen.queryByRole('textbox', { name })).toBeNull()
+      expect(screen.getByRole('region', { name })).toBeInTheDocument()
+    }
   })
 
   it('範囲外の個数では生成できず、範囲を案内する', async () => {
@@ -90,10 +97,10 @@ describe('パスワード', () => {
   it('既定設定で16文字のパスワードを生成し、コピーできる', async () => {
     const { user } = await setup()
     await user.click(screen.getByRole('button', { name: 'パスワードを生成' }))
-    expect(passwordOutput().value).toHaveLength(16)
+    expect(passwordText()).toHaveLength(16)
 
     await user.click(screen.getByRole('button', { name: 'パスワードをコピー' }))
-    expect(await navigator.clipboard.readText()).toBe(passwordOutput().value)
+    expect(await navigator.clipboard.readText()).toBe(passwordText())
     expect(screen.getByText('コピーしました')).toBeInTheDocument()
   })
 
@@ -169,11 +176,10 @@ describe('設定の保存', () => {
     await user.click(screen.getByRole('button', { name: 'パスワードを生成' }))
     await user.click(screen.getByRole('checkbox', { name: '記号' }))
 
-    const uuid = (screen.getByLabelText('生成結果') as HTMLTextAreaElement)
-      .value
+    const uuid = uuidText()
     const stored = Object.keys(localStorage).map((k) => localStorage.getItem(k))
     expect(Object.keys(localStorage)).toEqual([KEY])
-    expect(stored.join('')).not.toContain(passwordOutput().value)
+    expect(stored.join('')).not.toContain(passwordText())
     expect(stored.join('')).not.toContain(uuid)
   })
 
@@ -190,6 +196,6 @@ describe('設定の保存', () => {
     await user.click(screen.getByRole('checkbox', { name: '記号' }))
     expect(screen.getByRole('checkbox', { name: '記号' })).not.toBeChecked()
     await user.click(screen.getByRole('button', { name: 'パスワードを生成' }))
-    expect(passwordOutput().value).toMatch(/^[A-Za-z0-9]{16}$/)
+    expect(passwordText()).toMatch(/^[A-Za-z0-9]{16}$/)
   })
 })

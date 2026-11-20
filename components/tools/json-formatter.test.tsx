@@ -12,7 +12,7 @@ function setup() {
   return {
     user,
     input: screen.getByLabelText('入力'),
-    output: screen.getByLabelText('出力'),
+    output: screen.getByRole('region', { name: '出力' }),
     indent: screen.getByLabelText('インデント'),
     format: screen.getByRole('button', { name: '整形' }),
     minify: screen.getByRole('button', { name: '圧縮' }),
@@ -42,7 +42,7 @@ describe('JsonFormatter', () => {
     const { user, input, output, format } = setup()
     await paste(user, input, SAMPLE)
     await user.click(format)
-    expect(output).toHaveValue(
+    expect(output.textContent).toBe(
       '{\n  "a": 1,\n  "b": [\n    true,\n    null\n  ]\n}',
     )
   })
@@ -52,16 +52,20 @@ describe('JsonFormatter', () => {
     await paste(user, input, SAMPLE)
     await user.selectOptions(indent, 'タブ')
     await user.click(format)
-    expect((output as HTMLTextAreaElement).value.split('\n')[1]).toBe(
-      '\t"a": 1,',
-    )
+    expect(output.textContent?.split('\n')[1]).toBe('\t"a": 1,')
   })
 
   it('圧縮すると1行になる', async () => {
     const { user, input, output, minify } = setup()
     await paste(user, input, '{\n  "a": 1,\n  "b": [true, null]\n}')
     await user.click(minify)
-    expect(output).toHaveValue(SAMPLE)
+    expect(output.textContent).toBe(SAMPLE)
+  })
+
+  it('出力は編集できるテキスト欄ではなく、表示欄で表示する', () => {
+    setup()
+    expect(screen.queryByRole('textbox', { name: '出力' })).toBeNull()
+    expect(screen.getByRole('region', { name: '出力' })).toBeInTheDocument()
   })
 
   it('不正な JSON ではエラーを表示し、出力を表示しない', async () => {
@@ -75,7 +79,7 @@ describe('JsonFormatter', () => {
     expect(
       screen.getByText(/エラー: JSON の構文が正しくありません（1行目 8列目）/),
     ).toBeInTheDocument()
-    expect(output).toHaveValue('')
+    expect(output.textContent).toBe('')
     expect(screen.getByRole('button', { name: 'コピー' })).toBeDisabled()
   })
 

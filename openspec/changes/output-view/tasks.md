@@ -9,9 +9,9 @@
 
 ## 2. ツールの欄の置き換え
 
-- [ ] 2.1 `components/tools/json-formatter.tsx` の出力の textarea を `OutputView` に、`<label>出力</label>` を `<h2 id>出力</h2>` に置き換え、高さを design D3 のとおり指定する（スマートフォン幅 `h-124`、広い画面は列に `lg:contain-size` を付けて `lg:flex-1`）。`json-formatter.test.tsx` の欄の取り方を `getByRole('region', { name: '出力' })` と `textContent` に変え、出力が textbox でないことのテストを追加して、`npm test` が成功することを確認する
-- [ ] 2.2 `components/tools/id-generator.tsx` の UUID の生成結果の textarea とパスワードの input を `OutputView` に、それぞれの `<label>` を `<h3 id>` に置き換え、高さを design D3 のとおり指定し、不要になった `UUID_ROWS_MIN` を消す。`id-generator.test.tsx` の欄の取り方を region と `textContent` に変え、`.rows` のテストを「生成結果は1行に1件ずつ表示する」に置き換え、2つの欄が textbox でないことのテストを追加して、`npm test` が成功することを確認する
-- [ ] 2.3 `npm run lint` を実行し、エラーがないことを確認する
+- [x] 2.1 `components/tools/json-formatter.tsx` の出力の textarea を `OutputView` に、`<label>出力</label>` を `<h2 id>出力</h2>` に置き換え、高さを design D3 のとおり指定する（スマートフォン幅 `h-124.5`、広い画面は列に `lg:contain-size` を付けて `lg:flex-1`）。`json-formatter.test.tsx` の欄の取り方を `getByRole('region', { name: '出力' })` と `textContent` に変え、出力が textbox でないことのテストを追加して、`npm test` が成功することを確認する
+- [x] 2.2 `components/tools/id-generator.tsx` の UUID の生成結果の textarea とパスワードの input を `OutputView` に、それぞれの `<label>` を `<h3 id>` に置き換え、高さを design D3 のとおり指定し、不要になった `UUID_ROWS_MIN` を消す。`id-generator.test.tsx` の欄の取り方を region と `textContent` に変え、`.rows` のテストを「生成結果は1行に1件ずつ表示する」に置き換え、2つの欄が textbox でないことのテストを追加して、`npm test` が成功することを確認する
+- [x] 2.3 `npm run lint` を実行し、エラーがないことを確認する
 
 ## 3. 最終確認
 
