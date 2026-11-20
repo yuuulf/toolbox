@@ -40,12 +40,29 @@ describe('FavoriteColors', () => {
     expect(onRemove).toHaveBeenCalledWith('#336699')
   })
 
-  it('キーボードだけで選択と削除ができる', async () => {
+  it('コピーボタンを押すとその HEX をコピーし、変換欄には読み込まない', async () => {
+    const { onSelect, user } = setup(['#ff0000', '#336699'])
+    const copy = screen.getByRole('button', { name: '#336699 をコピー' })
+    await user.click(copy)
+    expect(await navigator.clipboard.readText()).toBe('#336699')
+    expect(copy.querySelector('svg')?.getAttribute('data-icon')).toBe('check')
+    expect(screen.getByText('コピーしました')).toBeInTheDocument()
+    expect(onSelect).not.toHaveBeenCalled()
+  })
+
+  it('キーボードだけで選択・コピー・削除ができる', async () => {
     const { onSelect, onRemove, user } = setup(['#ff0000'])
     await user.tab()
     expect(screen.getByRole('button', { name: '#ff0000' })).toHaveFocus()
     await user.keyboard('{Enter}')
     expect(onSelect).toHaveBeenCalledWith('#ff0000')
+
+    await user.tab()
+    expect(
+      screen.getByRole('button', { name: '#ff0000 をコピー' }),
+    ).toHaveFocus()
+    await user.keyboard('{Enter}')
+    expect(await navigator.clipboard.readText()).toBe('#ff0000')
 
     await user.tab()
     expect(screen.getByRole('button', { name: '#ff0000 を削除' })).toHaveFocus()

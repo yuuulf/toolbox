@@ -96,6 +96,17 @@ describe('ColorTool', () => {
     expect(favoriteButton()).toHaveAttribute('aria-pressed', 'true')
   })
 
+  it('一覧の色のコピーボタンを押すと HEX をコピーし、変換欄は変わらない', async () => {
+    localStorage.setItem(KEY, JSON.stringify(['#336699']))
+    const { user } = await setup()
+    await typeColor(user, '#ff0000')
+    await user.click(
+      favoriteList().getByRole('button', { name: '#336699 をコピー' }),
+    )
+    expect(await navigator.clipboard.readText()).toBe('#336699')
+    expect(colorInput()).toHaveValue('#ff0000')
+  })
+
   it('上限のとき、未登録の色では星ボタンが押せず、件数が説明になる', async () => {
     const ten = Array.from({ length: 10 }, (_, i) => `#00000${i}`)
     localStorage.setItem(KEY, JSON.stringify(ten))

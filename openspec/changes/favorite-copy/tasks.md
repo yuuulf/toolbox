@@ -9,9 +9,9 @@
 
 ## 2. お気に入りのコピー
 
-- [ ] 2.1 `components/tools/color-tool/favorite-colors.tsx` の各色の削除ボタンの左に `CopyButton`（`text={hex}`、`label={`${hex} をコピー`}`、`variant="subtle"`）を追加する（design D2）。`favorite-colors.test.tsx` に、押すとクリップボードに HEX が入り「コピーしました」が読み上げられ `onSelect` が呼ばれないこと、Tab と Enter でコピーできることのテストを追加し、既存のキーボード操作のテストを新しい Tab の順番に合わせて更新して、`npm test` が成功することを確認する
-- [ ] 2.2 `components/tools/color-tool/color-tool.test.tsx` に、お気に入りに登録した色のコピーボタンを押しても変換の入力欄が変わらないことのテストを追加し、`npm test` が成功することを確認する
-- [ ] 2.3 `npm run lint` を実行し、エラーがないことを確認する
+- [x] 2.1 `components/tools/color-tool/favorite-colors.tsx` の各色の削除ボタンの左に `CopyButton`（`text={hex}`、`label={`${hex} をコピー`}`、`variant="subtle"`）を追加する（design D2）。`favorite-colors.test.tsx` に、押すとクリップボードに HEX が入り「コピーしました」が読み上げられ `onSelect` が呼ばれないこと、Tab と Enter でコピーできることのテストを追加し、既存のキーボード操作のテストを新しい Tab の順番に合わせて更新して、`npm test` が成功することを確認する
+- [x] 2.2 `components/tools/color-tool/color-tool.test.tsx` に、お気に入りに登録した色のコピーボタンを押しても変換の入力欄が変わらないことのテストを追加し、`npm test` が成功することを確認する
+- [x] 2.3 `npm run lint` を実行し、エラーがないことを確認する
 
 ## 3. 最終確認
 

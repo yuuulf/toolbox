@@ -1,3 +1,4 @@
+import { CopyButton } from '@/components/copy-button'
 import { IconButton } from '@/components/icon-button'
 import { TrashIcon } from '@/components/icons'
 import type { Favorites } from '@/lib/tools/color-favorites'
@@ -58,8 +59,14 @@ export function FavoriteColors({
                 />
                 <span className="font-mono text-sm">{hex}</span>
               </button>
-              {/* 色見本のボタンと1つのまとまりに見えるよう、境界線は外側に付ける */}
-              <span className="flex items-center self-stretch border-l border-zinc-300 px-1 dark:border-zinc-700">
+              {/* 色見本のボタンと1つのまとまりに見えるよう、境界線は外側に付ける。
+                  コピーは読み込まずに1回で HEX を取り出すため。押し間違えの影響が大きい削除を端に置く */}
+              <span className="flex items-center gap-0.5 self-stretch border-l border-zinc-300 px-1 dark:border-zinc-700">
+                <CopyButton
+                  text={hex}
+                  label={`${hex} をコピー`}
+                  variant="subtle"
+                />
                 <IconButton
                   label={`${hex} を削除`}
                   icon={<TrashIcon />}
