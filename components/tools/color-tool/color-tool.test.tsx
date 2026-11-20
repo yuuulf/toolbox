@@ -118,10 +118,11 @@ describe('ColorTool', () => {
     expect(screen.queryByText(/不要な色/)).not.toBeInTheDocument()
   })
 
-  it('一覧から削除できる', async () => {
+  it('一覧の色を選んで星のボタンを押すと、一覧と保存から外れる', async () => {
     localStorage.setItem(KEY, JSON.stringify(['#ff0000', '#336699']))
     const { user } = await setup()
-    await user.click(screen.getByRole('button', { name: '#336699 を削除' }))
+    await user.click(favoriteList().getByRole('button', { name: '#336699' }))
+    await user.click(favoriteButton())
     expect(listedHexes()).toEqual(['#ff0000'])
     expect(JSON.parse(localStorage.getItem(KEY) ?? '')).toEqual(['#ff0000'])
   })

@@ -1,21 +1,19 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { FavoriteColors } from './favorite-colors'
 
 function setup(favorites: string[]) {
   const onSelect = vi.fn()
-  const onRemove = vi.fn()
   render(
     <FavoriteColors
       favorites={favorites}
       onSelect={onSelect}
-      onRemove={onRemove}
       countId="count"
     />,
   )
-  return { onSelect, onRemove, user: userEvent.setup() }
+  return { onSelect, user: userEvent.setup() }
 }
 
 describe('FavoriteColors', () => {
@@ -34,10 +32,12 @@ describe('FavoriteColors', () => {
     expect(onSelect).toHaveBeenCalledWith('#336699')
   })
 
-  it('削除ボタンを押すと onRemove にその HEX が渡る', async () => {
-    const { onRemove, user } = setup(['#ff0000', '#336699'])
-    await user.click(screen.getByRole('button', { name: '#336699 を削除' }))
-    expect(onRemove).toHaveBeenCalledWith('#336699')
+  it('各色には色見本のボタンとコピーボタンだけを置き、削除のボタンは置かない', () => {
+    setup(['#ff0000', '#336699'])
+    for (const item of screen.getAllByRole('listitem')) {
+      expect(within(item).getAllByRole('button')).toHaveLength(2)
+    }
+    expect(screen.queryByRole('button', { name: /削除/ })).toBeNull()
   })
 
   it('コピーボタンを押すとその HEX をコピーし、変換欄には読み込まない', async () => {
@@ -50,8 +50,8 @@ describe('FavoriteColors', () => {
     expect(onSelect).not.toHaveBeenCalled()
   })
 
-  it('キーボードだけで選択・コピー・削除ができる', async () => {
-    const { onSelect, onRemove, user } = setup(['#ff0000'])
+  it('キーボードだけで選択とコピーができる', async () => {
+    const { onSelect, user } = setup(['#ff0000'])
     await user.tab()
     expect(screen.getByRole('button', { name: '#ff0000' })).toHaveFocus()
     await user.keyboard('{Enter}')
@@ -63,11 +63,6 @@ describe('FavoriteColors', () => {
     ).toHaveFocus()
     await user.keyboard('{Enter}')
     expect(await navigator.clipboard.readText()).toBe('#ff0000')
-
-    await user.tab()
-    expect(screen.getByRole('button', { name: '#ff0000 を削除' })).toHaveFocus()
-    await user.keyboard(' ')
-    expect(onRemove).toHaveBeenCalledWith('#ff0000')
   })
 
   it('お気に入りがないときは、0/10 とまだ登録がないことを表示する', () => {

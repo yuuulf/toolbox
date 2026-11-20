@@ -1,23 +1,15 @@
 import { CopyButton } from '@/components/copy-button'
-import { IconButton } from '@/components/icon-button'
-import { TrashIcon } from '@/components/icons'
 import type { Favorites } from '@/lib/tools/color-favorites'
 import { MAX_FAVORITES } from '@/lib/tools/color-favorites'
 
 type Props = {
   favorites: Favorites
   onSelect: (hex: string) => void
-  onRemove: (hex: string) => void
   /** 読み上げ用の件数の id。上限のとき、変換欄の星ボタンが押せない理由として参照する */
   countId: string
 }
 
-export function FavoriteColors({
-  favorites,
-  onSelect,
-  onRemove,
-  countId,
-}: Props) {
+export function FavoriteColors({ favorites, onSelect, countId }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {/* 件数は見出しの行に置き、それだけで1行を使わない。10/10 で上限とわかるので、上限を知らせる文は出さない */}
@@ -60,17 +52,12 @@ export function FavoriteColors({
                 <span className="font-mono text-sm">{hex}</span>
               </button>
               {/* 色見本のボタンと1つのまとまりに見えるよう、境界線は外側に付ける。
-                  コピーは読み込まずに1回で HEX を取り出すため。押し間違えの影響が大きい削除を端に置く */}
-              <span className="flex items-center gap-0.5 self-stretch border-l border-zinc-300 px-1 dark:border-zinc-700">
+                  コピーは読み込まずに1回で HEX を取り出すため。削除のボタンは押し間違えを避けるため置かず、
+                  外すときは変換欄に読み込んで星のボタンを使う */}
+              <span className="flex items-center self-stretch border-l border-zinc-300 px-1 dark:border-zinc-700">
                 <CopyButton
                   text={hex}
                   label={`${hex} をコピー`}
-                  variant="subtle"
-                />
-                <IconButton
-                  label={`${hex} を削除`}
-                  icon={<TrashIcon />}
-                  onClick={() => onRemove(hex)}
                   variant="subtle"
                 />
               </span>

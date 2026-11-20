@@ -7,7 +7,6 @@ import {
   canAddFavorite,
   isFavorite,
   loadFavorites,
-  removeFavorite,
   saveFavorites,
   toggleFavorite,
 } from '@/lib/tools/color-favorites'
@@ -86,9 +85,6 @@ export function ColorTool() {
             countId={favoritesCountId}
             favorites={favorites}
             onSelect={setColor}
-            onRemove={(target) =>
-              favoritesStore.set(removeFavorite(favorites, target))
-            }
           />
         </section>
       </div>
