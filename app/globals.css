@@ -12,3 +12,15 @@
 :root {
   color-scheme: light dark;
 }
+
+/* フォーカスリングもアクセント色にする（ブラウザ既定は青）。形はブラウザ既定のまま色だけ変える。
+   outline-color は継承されないため、<body> のユーティリティではなくここで :focus-visible に指定する */
+@layer base {
+  :focus-visible {
+    outline-color: var(--color-accent-500);
+
+    @variant dark {
+      outline-color: var(--color-accent-300);
+    }
+  }
+}

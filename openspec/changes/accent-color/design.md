@@ -60,7 +60,14 @@
 ### D4. テスト
 
 - `markdown-view.test.tsx` に、リンクがアクセント色のクラス（`text-accent-700` と `dark:text-accent-300`）を持ち、`blue` のクラスを持たないことを確かめるテストを追加する。jsdom は Tailwind の CSS を解釈しないため、計算後の色ではなくクラスで確かめる
-- `<body>` のクラスと実際の描画色は単体テストでは確かめられないので、開発サーバーでライト・ダークのスクリーンショットを撮って目で確認する（tasks の最終グループ）
+- `<body>` のクラスとフォーカスリングの色は単体テストでは確かめられないので、開発サーバーでライト・ダークのスクリーンショットを撮って目で確認する（tasks の最終グループ）
+
+### D5. フォーカスリングは `globals.css` の `:focus-visible` で色だけ変える
+
+`outline-color` は継承されないため、D2 のように `<body>` のユーティリティでは指定できない。`globals.css` の `@layer base` で `:focus-visible { outline-color: var(--color-accent-500) }` とし、Tailwind の `@variant dark` でダークは `accent-300` にする。`outline-style` と太さはブラウザ既定（Chrome では `auto`）のまま残し、色だけを変える。Chrome は `auto` のリングでも `outline-color` を使うことを確認した。
+
+- 代替: 各要素に `focus-visible:outline-accent-500` を付ける → 付け忘れが起きる。今後の要素にも自動で効かせたい
+- 代替: `outline: 2px solid` で形も指定する → ブラウザごとの既定の見た目（角丸への追従など）を失う。色だけ変えれば要件を満たす
 
 ## Risks / Trade-offs
 
