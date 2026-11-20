@@ -34,7 +34,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="ja" className="h-full antialiased">
       {/* 幅 1024px 以上は左のサイドバーとメインを横に、それ未満は上部のバーとメインを縦に並べる */}
-      <body className="flex min-h-full flex-col bg-white text-zinc-900 lg:flex-row dark:bg-zinc-950 dark:text-zinc-100">
+      <body className="flex min-h-full flex-col bg-white text-zinc-900 accent-accent-500 lg:flex-row dark:bg-zinc-950 dark:text-zinc-100 dark:accent-accent-300">
         <Sidebar items={navItems} />
         <MobileHeader items={navItems} />
         {/* 各ページの main は、この中で今までどおり最大幅 1024px で中央に寄せる */}
