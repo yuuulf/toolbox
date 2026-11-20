@@ -4,8 +4,8 @@
 
 ## 1. 共通の表示欄
 
-- [ ] 1.1 `components/output-view.tsx` に `OutputView`（props: `value`、`labelId`、`className?`）を作る。`role="region"`・`aria-labelledby`・`tabIndex={0}`・`whitespace-pre`・`overflow-auto`・空でも1行分の `min-h`・`bg-zinc-50` / `dark:bg-zinc-900` を持たせる（design D1）。`components/output-view.test.tsx` に、見出しの名前で region として取れる・textbox ではない・`tabIndex` が 0・改行とタブがそのまま `textContent` に入る、のテストを追加し、`npm test` が成功することを確認する
-- [ ] 1.2 AGENTS.md のディレクトリ構成に `output-view.tsx` を追加し、「UI の統一」に「値を変えられない結果は `OutputView` で表示し、`readOnly` のテキスト欄を使わない。名前は見出しの id を `labelId` で渡して付ける」を追記する。`npm run format:check` が成功することを確認する（1.1 と同じコミットに含める）
+- [x] 1.1 `components/output-view.tsx` に `OutputView`（props: `value`、`labelId`、`className?`）を作る。`role="region"`・`aria-labelledby`・`tabIndex={0}`・`whitespace-pre`・`overflow-auto`・空でも1行分の `min-h`・`bg-zinc-50` / `dark:bg-zinc-900` を持たせる（design D1）。`components/output-view.test.tsx` に、見出しの名前で region として取れる・textbox ではない・`tabIndex` が 0・改行とタブがそのまま `textContent` に入る、のテストを追加し、`npm test` が成功することを確認する
+- [x] 1.2 AGENTS.md のディレクトリ構成に `output-view.tsx` を追加し、「UI の統一」に「値を変えられない結果は `OutputView` で表示し、`readOnly` のテキスト欄を使わない。名前は見出しの id を `labelId` で渡して付ける」を追記する。`npm run format:check` が成功することを確認する（1.1 と同じコミットに含める）
 
 ## 2. ツールの欄の置き換え
 
