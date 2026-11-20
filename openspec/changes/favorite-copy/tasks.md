@@ -4,8 +4,8 @@
 
 ## 1. コピーボタンの枠なしの見た目
 
-- [ ] 1.1 `components/copy-button.tsx` に `variant?: 'default' | 'subtle'` を追加し、`subtle` を `IconButton` の subtle と同じ枠なし・`p-1` の見た目にする（成功・失敗の色は `subtle` でも付ける。design D1）。`copy-button.test.tsx` に、`subtle` のとき枠のクラスを持たないこと、コピーとアイコンの切り替えが既定と同じに動くことのテストを追加し、`npm test` が成功することを確認する
-- [ ] 1.2 AGENTS.md の「UI の統一」の `CopyButton` の説明に、一覧の項目の中では `variant="subtle"` を使い、削除ボタンと見た目をそろえることを追記し、`npm run format:check` が成功することを確認する（1.1 と同じコミットに含める）
+- [x] 1.1 `components/copy-button.tsx` に `variant?: 'default' | 'subtle'` を追加し、`subtle` を `IconButton` の subtle と同じ枠なし・`p-1` の見た目にする（成功・失敗の色は `subtle` でも付ける。design D1）。`copy-button.test.tsx` に、`subtle` のとき枠のクラスを持たないこと、コピーとアイコンの切り替えが既定と同じに動くことのテストを追加し、`npm test` が成功することを確認する
+- [x] 1.2 AGENTS.md の「UI の統一」の `CopyButton` の説明に、一覧の項目の中では `variant="subtle"` を使い、削除ボタンと見た目をそろえることを追記し、`npm run format:check` が成功することを確認する（1.1 と同じコミットに含める）
 
 ## 2. お気に入りのコピー
 

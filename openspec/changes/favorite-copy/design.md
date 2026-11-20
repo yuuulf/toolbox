@@ -21,7 +21,7 @@
 
 ### D1. `CopyButton` に `variant` を追加する
 
-`variant?: 'default' | 'subtle'` を追加する。`default` は今の枠あり・`p-2`（既存の呼び出しは変更不要）。`subtle` は `IconButton` の subtle と同じ `rounded p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900`（ダークも同じ対応）で、枠を付けない。成功・失敗の色（緑・赤）は `subtle` でも付ける（`text-zinc-500` より後に効くよう、状態の色があるときは `text-zinc-500` を付けない）。
+`variant?: 'default' | 'subtle'` を追加する。`default` は今の枠あり・`p-2`（既存の呼び出しは変更不要）。`subtle` は `IconButton` の subtle と同じ `rounded p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900`（ダークも同じ対応）で、枠を付けない。成功・失敗の色（緑・赤）は `subtle` でも付ける。通常時の文字色 `text-zinc-500` とホバー時の `hover:text-zinc-900` は通常時だけ付け、結果を表示している間は付けない（押した直後はポインタが乗ったままなので、ホバーの文字色が付いていると結果の緑・赤が上書きされるため）。
 
 - 代替: お気に入りでは既定の枠ありの `CopyButton` をそのまま置く → 枠と `p-2` で項目の高さが増え、隣の削除ボタン（枠なし）と見た目がそろわない
 - 代替: `IconButton` に `CopyIcon` を渡してコピー処理を書く → コピーの結果の伝え方を二重に実装することになり、AGENTS.md の「コピーは必ず `CopyButton`」にも反する
