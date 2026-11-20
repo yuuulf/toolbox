@@ -3,7 +3,7 @@
 ## Context
 
 - 配色は Tailwind v4（4.3.3）のユーティリティで書いていて、`app/globals.css` には `@import 'tailwindcss'` と `color-scheme` しかない。ほぼすべてが `zinc` で、青は `markdown-view.tsx` のリンク（`text-blue-700 dark:text-blue-400`）だけ
-- チェックボックスは 3 か所（`components/tools/checklist/item-list.tsx`、`components/tools/id-generator.tsx`、Markdownプレビューのタスクリスト）で、どれも色を指定しておらず、ブラウザ既定の色（多くの環境で青）で描かれる
+- チェックボックスは 3 か所（`components/tools/checklist/item-list.tsx`、`components/tools/id-generator.tsx`、Markdownプレビューのタスクリスト）で、どれも色を指定しておらず、ブラウザ既定の色（多くの環境で青）で描かれる。ただしタスクリストは disabled で、ブラウザは disabled のチェックボックスに `accent-color` を使わず灰色で描く（今も青ではないので、対象外のままにする）
 - AGENTS.md は「色は Tailwind の既定スケールを使い、任意値（`text-[#00796b]` など）は避ける」としている。Tailwind の `teal` は #009688 と別の色なので、既定スケールではこの色を出せない
 
 ## Goals / Non-Goals
