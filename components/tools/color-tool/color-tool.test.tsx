@@ -96,6 +96,17 @@ describe('ColorTool', () => {
     expect(favoriteButton()).toHaveAttribute('aria-pressed', 'true')
   })
 
+  it('一覧の色のコピーボタンを押すと HEX をコピーし、変換欄は変わらない', async () => {
+    localStorage.setItem(KEY, JSON.stringify(['#336699']))
+    const { user } = await setup()
+    await typeColor(user, '#ff0000')
+    await user.click(
+      favoriteList().getByRole('button', { name: '#336699 をコピー' }),
+    )
+    expect(await navigator.clipboard.readText()).toBe('#336699')
+    expect(colorInput()).toHaveValue('#ff0000')
+  })
+
   it('上限のとき、未登録の色では星ボタンが押せず、件数が説明になる', async () => {
     const ten = Array.from({ length: 10 }, (_, i) => `#00000${i}`)
     localStorage.setItem(KEY, JSON.stringify(ten))
@@ -107,10 +118,11 @@ describe('ColorTool', () => {
     expect(screen.queryByText(/不要な色/)).not.toBeInTheDocument()
   })
 
-  it('一覧から削除できる', async () => {
+  it('一覧の色を選んで星のボタンを押すと、一覧と保存から外れる', async () => {
     localStorage.setItem(KEY, JSON.stringify(['#ff0000', '#336699']))
     const { user } = await setup()
-    await user.click(screen.getByRole('button', { name: '#336699 を削除' }))
+    await user.click(favoriteList().getByRole('button', { name: '#336699' }))
+    await user.click(favoriteButton())
     expect(listedHexes()).toEqual(['#ff0000'])
     expect(JSON.parse(localStorage.getItem(KEY) ?? '')).toEqual(['#ff0000'])
   })

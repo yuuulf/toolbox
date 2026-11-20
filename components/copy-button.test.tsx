@@ -48,6 +48,36 @@ describe('CopyButton', () => {
     ).toBeInTheDocument()
   })
 
+  it('subtle の見た目は枠を付けず、既定は枠を付ける', () => {
+    render(
+      <>
+        <CopyButton text="x" label="既定" />
+        <CopyButton text="x" label="一覧" variant="subtle" />
+      </>,
+    )
+    expect(screen.getByRole('button', { name: '既定' }).className).toMatch(
+      /\bborder\b/,
+    )
+    expect(screen.getByRole('button', { name: '一覧' }).className).not.toMatch(
+      /\bborder\b/,
+    )
+  })
+
+  it('subtle でもコピーして、アイコンをチェックに切り替え、結果の色を付ける', async () => {
+    const user = userEvent.setup()
+    render(
+      <CopyButton text="#336699" label="#336699 をコピー" variant="subtle" />,
+    )
+    const button = screen.getByRole('button', { name: '#336699 をコピー' })
+    expect(button.className).toContain('text-zinc-500')
+    await user.click(button)
+    expect(await navigator.clipboard.readText()).toBe('#336699')
+    expect(iconOf(button)).toBe('check')
+    expect(button.className).toContain('text-green-700')
+    expect(button.className).not.toContain('text-zinc-500')
+    expect(screen.getByText('コピーしました')).toBeInTheDocument()
+  })
+
   it('ボタンには文字を表示せず、名前をツールチップで示す', () => {
     render(<CopyButton text="x" label="パスワードをコピー" />)
     const button = screen.getByRole('button', { name: 'パスワードをコピー' })

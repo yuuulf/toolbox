@@ -18,14 +18,38 @@ const STATUS_COLORS: Record<Status, string> = {
   failed: 'text-red-700 dark:text-red-400',
 }
 
+type Variant = 'default' | 'subtle'
+
+// subtle は一覧の項目の中で使う枠なしの見た目。隣に並ぶ IconButton の subtle（削除など）とそろえる
+const VARIANT_STYLES: Record<Variant, string> = {
+  default:
+    'rounded-md border border-zinc-300 p-2 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800',
+  subtle: 'rounded p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800',
+}
+
+// subtle の通常時の文字色（ホバー時を含む）。結果の色（緑・赤）と同時に付けると、押した直後にポインタが
+// 乗ったままのときに結果の色が上書きされるため、通常時だけ付ける
+const SUBTLE_IDLE_COLOR =
+  'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'
+
 type Props = {
   text: string
   /** ボタンのアクセシブルな名前とツールチップ。複数のコピーボタンを区別したいときに指定する */
   label?: string
+  /** default: 枠あり。subtle: 枠なしの薄い色（一覧の項目の中） */
+  variant?: Variant
 }
 
-export function CopyButton({ text, label = 'コピー' }: Props) {
+export function CopyButton({
+  text,
+  label = 'コピー',
+  variant = 'default',
+}: Props) {
   const [status, setStatus] = useState<Status>('idle')
+  const statusColor =
+    variant === 'subtle' && status === 'idle'
+      ? SUBTLE_IDLE_COLOR
+      : STATUS_COLORS[status]
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => () => clearTimeout(timerRef.current), [])
@@ -50,7 +74,7 @@ export function CopyButton({ text, label = 'コピー' }: Props) {
         disabled={text === ''}
         aria-label={label}
         title={label}
-        className={`rounded-md border border-zinc-300 p-2 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-800 ${STATUS_COLORS[status]}`}
+        className={`${VARIANT_STYLES[variant]} disabled:cursor-not-allowed disabled:opacity-50 ${statusColor}`}
       >
         <StatusIcon status={status} />
       </button>
