@@ -101,7 +101,7 @@ export function JsonFormatter() {
         <OutputView
           value={output}
           labelId={outputId}
-          className="h-124.5 lg:h-auto lg:min-h-0 lg:flex-1"
+          className="h-124.5 lg:h-auto lg:flex-1"
         />
       </div>
     </div>

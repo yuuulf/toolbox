@@ -106,11 +106,11 @@ function UuidSection() {
           <CopyButton text={output} label="UUID をコピー" />
         </div>
         {/* 欄の高さは中身（件数の行数）のまま伸ばす。上限は 1024px 未満では 20行分（max-h-105）、
-            広い画面では枠の高さ（min-h-0 で枠に収まるまで縮み、中でスクロールする） */}
+            広い画面では枠の高さ（最低の高さが1行分なので、枠に収まるまで縮んで中でスクロールする） */}
         <OutputView
           value={output}
           labelId={outputId}
-          className="max-h-105 lg:max-h-none lg:min-h-0"
+          className="max-h-105 lg:max-h-none"
         />
       </div>
     </section>
