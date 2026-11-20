@@ -9,9 +9,9 @@
 
 ## 2. リンクとチェックボックスへの適用
 
-- [ ] 2.1 `components/tools/markdown-preview/markdown-view.tsx` のリンクのクラスを `text-accent-700 underline dark:text-accent-300` に置き換え、`markdown-view.test.tsx` に「リンクはアクセント色の文字で表示する」テスト（`text-accent-700` と `dark:text-accent-300` を持ち、`blue` を含むクラスを持たない）を追加して、`npm test` が成功することを確認する
-- [ ] 2.2 `app/layout.tsx` の `<body>` に `accent-accent-500 dark:accent-accent-300` を加え、`app/` と `components/` に `blue-` のクラスが残っていないことを `grep` で確認し、`npm test` が成功することを確認する
-- [ ] 2.3 `npm run lint` を実行し、エラーがないことを確認する
+- [x] 2.1 `components/tools/markdown-preview/markdown-view.tsx` のリンクのクラスを `text-accent-700 underline dark:text-accent-300` に置き換え、`markdown-view.test.tsx` に「リンクはアクセント色の文字で表示する」テスト（`text-accent-700` と `dark:text-accent-300` を持ち、`blue` を含むクラスを持たない）を追加して、`npm test` が成功することを確認する
+- [x] 2.2 `app/layout.tsx` の `<body>` に `accent-accent-500 dark:accent-accent-300` を加え、`app/` と `components/` に `blue-` のクラスが残っていないことを `grep` で確認し、`npm test` が成功することを確認する
+- [x] 2.3 `npm run lint` を実行し、エラーがないことを確認する
 
 ## 3. 最終確認
 

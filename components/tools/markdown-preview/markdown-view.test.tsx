@@ -69,6 +69,15 @@ describe('MarkdownView', () => {
     expect(link.getAttribute('rel')).toBe('noopener noreferrer')
   })
 
+  it('リンクはアクセント色の文字で表示する', () => {
+    render(<MarkdownView markdown="[例](https://example.com)" />)
+    const link = screen.getByRole('link', { name: '例' })
+    // jsdom は Tailwind の CSS を解釈しないため、計算後の色ではなくクラスで確かめる
+    expect(link.classList.contains('text-accent-700')).toBe(true)
+    expect(link.classList.contains('dark:text-accent-300')).toBe(true)
+    expect(link.className).not.toContain('blue')
+  })
+
   it('javascript: のリンクはリンクにしない', () => {
     render(<MarkdownView markdown="[押す](javascript:alert(1))" />)
     expect(screen.getByText('押す')).toBeTruthy()
