@@ -2,6 +2,7 @@
 
 import { useId, useState } from 'react'
 import { CopyButton } from '@/components/copy-button'
+import { OutputView } from '@/components/output-view'
 import type { JsonIndent, JsonResult } from '@/lib/tools/json-format'
 import { formatJson, minifyJson } from '@/lib/tools/json-format'
 
@@ -88,20 +89,19 @@ export function JsonFormatter() {
         </div>
       </div>
 
-      <div className="flex min-w-0 flex-col gap-1 lg:flex-1 lg:basis-0">
+      {/* contain-size で、出力が長くても列の高さが中身に引っ張られないようにする（高さは入力欄の列に合わせる） */}
+      <div className="flex min-w-0 flex-col gap-1 lg:flex-1 lg:basis-0 lg:contain-size">
         <div className="flex min-h-9 items-center justify-between gap-2">
-          <label htmlFor={outputId} className="text-sm font-medium">
+          <h2 id={outputId} className="text-sm font-medium">
             出力
-          </label>
+          </h2>
           <CopyButton text={output} />
         </div>
-        <textarea
-          id={outputId}
+        {/* 狭い画面の高さは、入力欄（rows={24}）と同じにする */}
+        <OutputView
           value={output}
-          readOnly
-          rows={24}
-          spellCheck={false}
-          className="w-full rounded-md border border-zinc-300 bg-zinc-50 p-2 font-mono text-sm lg:flex-1 dark:border-zinc-700 dark:bg-zinc-900"
+          labelId={outputId}
+          className="h-124.5 lg:h-auto lg:flex-1"
         />
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { useId, useState, useSyncExternalStore } from 'react'
 import { CopyButton } from '@/components/copy-button'
+import { OutputView } from '@/components/output-view'
 import type { CharsetKey, PasswordOptions } from '@/lib/tools/id-generate'
 import {
   DEFAULT_PASSWORD_OPTIONS,
@@ -14,10 +15,6 @@ import {
   UUID_COUNT_MAX,
   UUID_COUNT_MIN,
 } from '@/lib/tools/id-generate'
-
-// UUID の生成結果の欄は、件数の行数（初期表示と1件のときは1行）にして、件数に合わせて伸ばす。
-// 伸びる上限は、1024px 未満では 20行分（max-h-105）、広い画面では画面の残りの高さ（20行分が最低）
-const UUID_ROWS_MIN = 1
 
 const CHARSET_LABELS: { key: CharsetKey; label: string }[] = [
   { key: 'upper', label: '英大文字（A-Z）' },
@@ -103,18 +100,17 @@ function UuidSection() {
           contain-size で枠が中身の高さに引っ張られないようにし、最低の高さ（見出しの行 + 20行分）は枠に付ける */}
       <div className="flex flex-col gap-1 lg:min-h-114 lg:contain-size">
         <div className="flex items-center justify-between gap-2">
-          <label htmlFor={outputId} className="text-sm font-medium">
+          <h3 id={outputId} className="text-sm font-medium">
             生成結果
-          </label>
+          </h3>
           <CopyButton text={output} label="UUID をコピー" />
         </div>
-        <textarea
-          id={outputId}
+        {/* 欄の高さは中身（件数の行数）のまま伸ばす。上限は 1024px 未満では 20行分（max-h-105）、
+            広い画面では枠の高さ（最低の高さが1行分なので、枠に収まるまで縮んで中でスクロールする） */}
+        <OutputView
           value={output}
-          readOnly
-          rows={Math.max(uuids.length, UUID_ROWS_MIN)}
-          spellCheck={false}
-          className="max-h-105 w-full rounded-md border border-zinc-300 bg-zinc-50 p-2 font-mono text-sm lg:max-h-none lg:min-h-0 dark:border-zinc-700 dark:bg-zinc-900"
+          labelId={outputId}
+          className="max-h-105 lg:max-h-none"
         />
       </div>
     </section>
@@ -255,19 +251,12 @@ function PasswordSection() {
       </div>
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-2">
-          <label htmlFor={outputId} className="text-sm font-medium">
+          <h3 id={outputId} className="text-sm font-medium">
             生成したパスワード
-          </label>
+          </h3>
           <CopyButton text={password} label="パスワードをコピー" />
         </div>
-        <input
-          id={outputId}
-          type="text"
-          value={password}
-          readOnly
-          spellCheck={false}
-          className="w-full rounded-md border border-zinc-300 bg-zinc-50 p-2 font-mono text-sm dark:border-zinc-700 dark:bg-zinc-900"
-        />
+        <OutputView value={password} labelId={outputId} />
       </div>
     </section>
   )
