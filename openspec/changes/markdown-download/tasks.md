@@ -9,9 +9,9 @@
 ## 2. ダウンロードのボタン
 
 - [x] 2.1 `components/icons.tsx` に `DownloadIcon`（`data-icon="download"`、下向きの矢印と受け皿）を追加し、`icons.test.tsx` に `aria-hidden` で `data-icon="download"` の SVG を描くテストを追加して、`npm test` が成功することを確認する（design D3）
-- [ ] 2.2 `components/tools/markdown-preview/markdown-preview.tsx` に、Blob と一時的な `<a download>` で入力欄の即時の値を `toMarkdownFileName` の名前でダウンロードする処理と、`IconButton`（`label="Markdown をダウンロード"`、`variant="subtle"`、`icon={<DownloadIcon />}`、`disabled={!ready || markdown.trim() === ''}`）を追加し、見えている欄の見出しの行の操作群の右端に1つだけ置く（design D2・D4）。`markdown-preview.test.tsx` に、`URL.createObjectURL` / `revokeObjectURL` をスタブし `HTMLAnchorElement.prototype.click` をスパイして、押すと `download` が `メモ.md` で Blob の中身が入力と同じ（`await blob.text()`）・型が `text/markdown;charset=utf-8` であること、`revokeObjectURL` が呼ばれること、空と空白だけのときは押せないこと、3つの表示それぞれでボタンがちょうど1つあること、Tab で移動して Enter でダウンロードできること、`fetch` が呼ばれないことのテストを追加し、`npm test` が成功することを確認する
-- [ ] 2.3 `components/tools/registry.ts` の Markdownプレビューの説明文の末尾に「.md ファイルとしてダウンロードできます。」を追記し（registry のテストが説明文に依存していれば更新する）、README.md のツール一覧の説明を同じ文言にそろえ、データの扱いの節に「Markdownプレビューのダウンロードはブラウザ内でファイルを作り、送信しません」の旨を追記して、`npm test` と `npm run format:check` が成功することを確認する（2.2 と同じコミットに含める）
-- [ ] 2.4 `npm run lint` を実行し、エラーがないことを確認する
+- [x] 2.2 `components/tools/markdown-preview/markdown-preview.tsx` に、Blob と一時的な `<a download>` で入力欄の即時の値を `toMarkdownFileName` の名前でダウンロードする処理と、`IconButton`（`label="Markdown をダウンロード"`、`variant="subtle"`、`icon={<DownloadIcon />}`、`disabled={!ready || markdown.trim() === ''}`）を追加し、見えている欄の見出しの行の操作群の右端に1つだけ置く（design D2・D4）。`markdown-preview.test.tsx` に、`URL.createObjectURL` / `revokeObjectURL` をスタブし `HTMLAnchorElement.prototype.click` をスパイして、押すと `download` が `メモ.md` で Blob の中身が入力と同じ（`await blob.text()`）・型が `text/markdown;charset=utf-8` であること、`revokeObjectURL` が呼ばれること、空と空白だけのときは押せないこと、3つの表示それぞれでボタンがちょうど1つあること、Tab で移動して Enter でダウンロードできること、`fetch` が呼ばれないことのテストを追加し、`npm test` が成功することを確認する
+- [x] 2.3 `components/tools/registry.ts` の Markdownプレビューの説明文の末尾に「.md ファイルとしてダウンロードできます。」を追記し（registry のテストが説明文に依存していれば更新する）、README.md のツール一覧の説明を同じ文言にそろえ、データの扱いの節に「Markdownプレビューのダウンロードはブラウザ内でファイルを作り、送信しません」の旨を追記して、`npm test` と `npm run format:check` が成功することを確認する（2.2 と同じコミットに含める）
+- [x] 2.4 `npm run lint` を実行し、エラーがないことを確認する
 
 ## 3. 最終確認
 

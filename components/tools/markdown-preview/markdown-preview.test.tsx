@@ -69,6 +69,103 @@ describe('MarkdownPreview', () => {
     }
   })
 
+  describe('ダウンロード', () => {
+    const downloadButton = () =>
+      screen.getByRole('button', { name: 'Markdown をダウンロード' })
+
+    // jsdom には createObjectURL がなく、<a> の click で保存もされないので、作った Blob とリンクを記録する
+    function stubDownload() {
+      const blobs: Blob[] = []
+      const createObjectURL = vi.fn((blob: Blob) => {
+        blobs.push(blob)
+        return 'blob:test'
+      })
+      const revokeObjectURL = vi.fn()
+      // jsdom の URL には両方ともないので、テストの間だけ足す（afterEach で消す）
+      Object.assign(URL, { createObjectURL, revokeObjectURL })
+      const links: HTMLAnchorElement[] = []
+      vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(
+        function (this: HTMLAnchorElement) {
+          links.push(this)
+        },
+      )
+      return { blobs, links, revokeObjectURL }
+    }
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+      const url: Partial<
+        Pick<typeof URL, 'createObjectURL' | 'revokeObjectURL'>
+      > = URL
+      delete url.createObjectURL
+      delete url.revokeObjectURL
+    })
+
+    it('押すと入力をそのまま .md ファイルとして、送信せずにダウンロードする', async () => {
+      const { blobs, links, revokeObjectURL } = stubDownload()
+      const fetchSpy = vi.fn()
+      vi.stubGlobal('fetch', fetchSpy)
+      const user = userEvent.setup()
+      render(<MarkdownPreview />)
+      fireEvent.change(input(), { target: { value: '# メモ\n\n本文' } })
+
+      await user.click(downloadButton())
+
+      expect(links).toHaveLength(1)
+      expect(links[0].download).toBe('メモ.md')
+      expect(links[0].getAttribute('href')).toBe('blob:test')
+      expect(blobs[0].type).toBe('text/markdown;charset=utf-8')
+      expect(await blobs[0].text()).toBe('# メモ\n\n本文')
+      expect(revokeObjectURL).toHaveBeenCalledWith('blob:test')
+      expect(fetchSpy).not.toHaveBeenCalled()
+    })
+
+    it('見出しがなければ markdown.md にする', async () => {
+      const { links } = stubDownload()
+      const user = userEvent.setup()
+      render(<MarkdownPreview />)
+      fireEvent.change(input(), { target: { value: '本文だけ' } })
+      await user.click(downloadButton())
+      expect(links[0].download).toBe('markdown.md')
+    })
+
+    it.each([
+      ['空', ''],
+      ['空白と改行だけ', '  \n\t\n'],
+    ])('入力が%sのときは押せない', (_, value) => {
+      render(<MarkdownPreview />)
+      fireEvent.change(input(), { target: { value } })
+      expect((downloadButton() as HTMLButtonElement).disabled).toBe(true)
+    })
+
+    it('どの表示でも、ボタンがちょうど1つある', async () => {
+      const user = userEvent.setup()
+      render(<MarkdownPreview />)
+      fireEvent.change(input(), { target: { value: 'a' } })
+      for (const name of ['入力のみ', 'プレビューのみ', '並べて表示']) {
+        await user.click(screen.getByRole('radio', { name }))
+        const buttons = screen.getAllByRole('button', {
+          name: 'Markdown をダウンロード',
+        })
+        expect(buttons).toHaveLength(1)
+        expect(buttons[0].getAttribute('title')).toBe('Markdown をダウンロード')
+      }
+    })
+
+    it('Tab で移動して Enter でダウンロードできる', async () => {
+      const { links } = stubDownload()
+      const user = userEvent.setup()
+      render(<MarkdownPreview />)
+      fireEvent.change(input(), { target: { value: '# キー' } })
+      input().focus()
+      // 並べて表示では、入力欄の見出しの行のボタンは入力欄より前にあるので Shift+Tab で戻る
+      await user.tab({ shift: true })
+      expect(document.activeElement).toBe(downloadButton())
+      await user.keyboard('{Enter}')
+      expect(links[0].download).toBe('キー.md')
+    })
+  })
+
   describe('自動保存', () => {
     beforeEach(() => {
       vi.useFakeTimers()
