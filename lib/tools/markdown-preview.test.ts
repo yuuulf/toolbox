@@ -1,9 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  DEFAULT_FILE_NAME,
   MARKDOWN_DRAFT_KEY,
+  MAX_FILE_NAME_LENGTH,
   isEmptyHref,
   loadDraft,
   saveDraft,
+  toMarkdownFileName,
   toMermaidId,
 } from './markdown-preview'
 
@@ -77,5 +80,69 @@ describe('isEmptyHref', () => {
     expect(isEmptyHref('')).toBe(true)
     expect(isEmptyHref('  ')).toBe(true)
     expect(isEmptyHref('https://example.com')).toBe(false)
+  })
+})
+
+describe('toMarkdownFileName', () => {
+  it('最初のレベル1見出しから名前を付け、使えない文字を取り除く', () => {
+    expect(toMarkdownFileName('# 議事録 11/26\n\n本文')).toBe('議事録 1126.md')
+  })
+
+  it('2つ目以降の見出しは使わない', () => {
+    expect(toMarkdownFileName('本文\n# 最初\n# 次')).toBe('最初.md')
+  })
+
+  it.each([
+    ['空', ''],
+    ['本文だけ', '本文だけ'],
+    ['レベル2見出しだけ', '## 小見出し'],
+    ['# の後に空白がない', '#タグ'],
+    ['空の見出し', '#'],
+  ])('%s のときは markdown.md', (_, markdown) => {
+    expect(toMarkdownFileName(markdown)).toBe(`${DEFAULT_FILE_NAME}.md`)
+  })
+
+  it.each([
+    ['```', '```sh\n# コメント\n```\n\n# 本当の見出し'],
+    ['~~~', '~~~\n# コメント\n~~~\n# 本当の見出し'],
+    ['``` の中の ~~~', '```\n~~~\n# コメント\n```\n# 本当の見出し'],
+  ])('%s のコードブロックの中の # は見出しにしない', (_, markdown) => {
+    expect(toMarkdownFileName(markdown)).toBe('本当の見出し.md')
+  })
+
+  it('閉じの # と前後の空白、末尾のピリオドを取り除く', () => {
+    expect(toMarkdownFileName('  #   タイトル...  ##  ')).toBe('タイトル.md')
+  })
+
+  it('見出しの文字の一部の # は残す', () => {
+    expect(toMarkdownFileName('# C#')).toBe('C#.md')
+  })
+
+  it('使えない文字と制御文字を取り除く', () => {
+    expect(toMarkdownFileName('# a\\b:c*d?e"f<g>h|i\u0007j')).toBe(
+      'abcdefghij.md',
+    )
+  })
+
+  it('使える文字が残らないときは markdown.md', () => {
+    expect(toMarkdownFileName('# ???')).toBe(`${DEFAULT_FILE_NAME}.md`)
+  })
+
+  it('長い名前はコードポイント単位で切り、絵文字を途中で切らない', () => {
+    const name = '😀'.repeat(MAX_FILE_NAME_LENGTH + 5)
+    expect(toMarkdownFileName(`# ${name}`)).toBe(
+      `${'😀'.repeat(MAX_FILE_NAME_LENGTH)}.md`,
+    )
+  })
+
+  it('切った後の末尾の空白も取り除く', () => {
+    const name = `${'a'.repeat(MAX_FILE_NAME_LENGTH - 1)} b`
+    expect(toMarkdownFileName(`# ${name}`)).toBe(
+      `${'a'.repeat(MAX_FILE_NAME_LENGTH - 1)}.md`,
+    )
+  })
+
+  it('CRLF の改行でも見出しを見つける', () => {
+    expect(toMarkdownFileName('本文\r\n# 見出し\r\n')).toBe('見出し.md')
   })
 })

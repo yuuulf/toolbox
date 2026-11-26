@@ -4,7 +4,7 @@
 
 ## 1. ファイル名を作るロジック
 
-- [ ] 1.1 `lib/tools/markdown-preview.ts` に `toMarkdownFileName(markdown: string): string` と定数 `MAX_FILE_NAME_LENGTH = 100`・`DEFAULT_FILE_NAME = 'markdown'` を追加する（design D1）。`markdown-preview.test.ts` に、最初のレベル1見出しから名前を付ける（`# 議事録 11/26` → `議事録 1126.md`）、`##` だけ・本文だけ・空のときは `markdown.md`、コードブロック（` ``` ` と `~~~`）の中の `#` 行を無視する、閉じの `#` と前後の空白・末尾のピリオドを除く、使えない文字と制御文字を除く、`# ???` は `markdown.md`、100文字を超える名前（絵文字を含む）をコードポイント単位で切る、のテストを追加し、`npm test` が成功することを確認する
+- [x] 1.1 `lib/tools/markdown-preview.ts` に `toMarkdownFileName(markdown: string): string` と定数 `MAX_FILE_NAME_LENGTH = 100`・`DEFAULT_FILE_NAME = 'markdown'` を追加する（design D1）。`markdown-preview.test.ts` に、最初のレベル1見出しから名前を付ける（`# 議事録 11/26` → `議事録 1126.md`）、`##` だけ・本文だけ・空のときは `markdown.md`、コードブロック（` ``` ` と `~~~`）の中の `#` 行を無視する、閉じの `#` と前後の空白・末尾のピリオドを除く、使えない文字と制御文字を除く、`# ???` は `markdown.md`、100文字を超える名前（絵文字を含む）をコードポイント単位で切る、のテストを追加し、`npm test` が成功することを確認する
 
 ## 2. ダウンロードのボタン
 
