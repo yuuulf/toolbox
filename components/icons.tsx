@@ -39,3 +39,8 @@ export function TrashIcon() {
     />
   )
 }
+
+// 下向きの矢印と受け皿のダウンロード
+export function DownloadIcon() {
+  return <Icon name="download" d="M12 4v11 M7 10l5 5 5-5 M5 20h14" />
+}
