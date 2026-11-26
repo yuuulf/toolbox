@@ -77,7 +77,7 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
     <IconButton
       label="Markdown をダウンロード"
       icon={<DownloadIcon />}
-      variant="subtle"
+      variant="outline"
       onClick={() => downloadMarkdown(markdown)}
       disabled={!ready || markdown.trim() === ''}
     />

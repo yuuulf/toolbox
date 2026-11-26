@@ -33,10 +33,11 @@
 - この処理はブラウザ API に触れるので、コンポーネントファイル内の関数（`downloadMarkdown`）に置き、名前を作るロジックだけを `lib/` に置く
 - 代替案: `data:` URL → 長い文字列でブラウザの上限にかかることがあるため採らない。File System Access API → 対応ブラウザが限られ、スコープ外
 
-### D3. ボタンは `IconButton` の `subtle` に新しい `DownloadIcon` を付ける
+### D3. ボタンは `IconButton` の新しい `outline`（枠あり）に新しい `DownloadIcon` を付ける
 
 - `components/icons.tsx` に下向きの矢印と受け皿の `DownloadIcon`（`data-icon="download"`）を追加する
-- 見出しの行は文字と切り替えだけの軽い見た目なので、塗りつぶしの `primary` ではなく `subtle` にする
+- 見た目は `CopyButton` の既定（枠あり・`p-2`）とそろえる。`IconButton` に `outline` を追加し、そのクラスを `CopyButton` の既定でも使って、両者の見た目がずれないようにする
+- 塗りつぶしの `primary` は見出しの行には重く、枠なしの `subtle` はボタンだと分かりにくいため使わない（当初は `subtle` の予定だったが、レビューで枠ありに変更）
 - `disabled` は `!ready || markdown.trim() === ''`（保存値を読み終えるまでも押せない）
 
 ### D4. ボタンは見えている欄の見出しの行の右端の操作群に1つだけ置く

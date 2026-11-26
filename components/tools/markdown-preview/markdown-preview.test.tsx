@@ -149,6 +149,8 @@ describe('MarkdownPreview', () => {
         })
         expect(buttons).toHaveLength(1)
         expect(buttons[0].getAttribute('title')).toBe('Markdown をダウンロード')
+        // コピーボタンと同じ枠ありの見た目
+        expect(buttons[0].className).toMatch(/\bborder\b/)
       }
     })
 

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-type Variant = 'primary' | 'subtle'
+type Variant = 'primary' | 'outline' | 'subtle'
 
 type Props = {
   /** アクセシブルな名前とツールチップ（例:「追加」「#336699 を削除」） */
@@ -11,13 +11,16 @@ type Props = {
   /** フォームの送信ボタンにするときは submit（Enter キーでも押せる） */
   type?: 'button' | 'submit'
   disabled?: boolean
-  /** primary: 塗りつぶし（追加・保存）。subtle: 枠なしの薄い色（一覧の中の削除） */
+  /** primary: 塗りつぶし（追加・保存）。outline: 枠あり（CopyButton の既定と同じ。見出しの行のダウンロードなど）。subtle: 枠なしの薄い色（一覧の中の削除） */
   variant?: Variant
 }
 
 export const ICON_BUTTON_STYLES: Record<Variant, string> = {
   primary:
     'rounded-md bg-zinc-900 p-2 text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300',
+  // CopyButton の既定（枠あり）もこのクラスを使い、並べたときの見た目をそろえる
+  outline:
+    'rounded-md border border-zinc-300 p-2 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-800',
   subtle:
     'rounded p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-zinc-800 dark:hover:text-zinc-100',
 }

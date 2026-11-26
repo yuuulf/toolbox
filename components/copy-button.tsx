@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { ICON_BUTTON_STYLES } from '@/components/icon-button'
 
 const MESSAGE_DURATION_MS = 2000
 
@@ -22,8 +23,7 @@ type Variant = 'default' | 'subtle'
 
 // subtle は一覧の項目の中で使う枠なしの見た目。隣に並ぶ IconButton の subtle（削除など）とそろえる
 const VARIANT_STYLES: Record<Variant, string> = {
-  default:
-    'rounded-md border border-zinc-300 p-2 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800',
+  default: ICON_BUTTON_STYLES.outline,
   subtle: 'rounded p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800',
 }
 
