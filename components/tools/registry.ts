@@ -69,7 +69,7 @@ export const tools: ToolDefinition[] = [
     slug: 'markdown-preview',
     name: 'Markdownプレビュー',
     description:
-      'Markdown を入力と同時にプレビューします。表・タスクリストと Mermaid の図に対応しています。',
+      'Markdown を入力と同時にプレビューします。表・タスクリストと Mermaid の図に対応しています。.md ファイルとしてダウンロードできます。',
     storage: 'localStorage',
     component: MarkdownPreview,
   },

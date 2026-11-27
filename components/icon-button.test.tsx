@@ -45,6 +45,13 @@ describe('IconButton', () => {
     expect(onClick).toHaveBeenCalledTimes(3)
   })
 
+  it('outline は CopyButton の既定と同じ枠ありの見た目になる', () => {
+    render(<IconButton label="追加" icon={<PlusIcon />} variant="outline" />)
+    expect(screen.getByRole('button', { name: '追加' }).className).toContain(
+      'border-zinc-300',
+    )
+  })
+
   it('type="submit" でフォームを送信できる', () => {
     const onSubmit = vi.fn((e: { preventDefault: () => void }) =>
       e.preventDefault(),

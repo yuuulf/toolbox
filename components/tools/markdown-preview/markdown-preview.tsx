@@ -2,7 +2,13 @@
 
 import type { ReactNode } from 'react'
 import { useDeferredValue, useId, useState, useSyncExternalStore } from 'react'
-import { loadDraft, saveDraft } from '@/lib/tools/markdown-preview'
+import { IconButton } from '@/components/icon-button'
+import { DownloadIcon } from '@/components/icons'
+import {
+  loadDraft,
+  saveDraft,
+  toMarkdownFileName,
+} from '@/lib/tools/markdown-preview'
 import { MarkdownView } from './markdown-view'
 import type { ViewMode } from './view-mode-switch'
 import { ViewModeSwitch } from './view-mode-switch'
@@ -12,6 +18,20 @@ const AUTOSAVE_FAILED_MESSAGE =
   '自動保存できません。再読み込みすると入力が消えます。'
 
 const noopSubscribe = () => () => {}
+
+const MARKDOWN_MIME_TYPE = 'text/markdown;charset=utf-8'
+
+// ブラウザ内で .md ファイルを作って保存させる（どこにも送信しない）
+function downloadMarkdown(markdown: string) {
+  const url = URL.createObjectURL(
+    new Blob([markdown], { type: MARKDOWN_MIME_TYPE }),
+  )
+  const link = document.createElement('a')
+  link.href = url
+  link.download = toMarkdownFileName(markdown)
+  link.click()
+  URL.revokeObjectURL(url)
+}
 
 // 保存した Markdown はブラウザでだけ読める（ページはビルド時にプリレンダーされる）。
 // サーバーとハイドレーション中は null を返し、読めるようになったら入力欄を保存値で作り直す
@@ -52,6 +72,16 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
     </p>
   )
   const modeSwitch = <ViewModeSwitch value={mode} onChange={setMode} />
+  // ダウンロードは自動保存の文言と同じく、見えている欄のうち入力欄を優先して1つだけ置く（同じ名前のボタンを重ねないため）
+  const downloadButton = (
+    <IconButton
+      label="Markdown をダウンロード"
+      icon={<DownloadIcon />}
+      variant="outline"
+      onClick={() => downloadMarkdown(markdown)}
+      disabled={!ready || markdown.trim() === ''}
+    />
+  )
 
   return (
     // 並べて表示は lg 以上で左右に、それ未満では縦に並べる。片方だけのときは幅いっぱいに使う。
@@ -73,6 +103,7 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
             <div className="flex flex-wrap items-center justify-end gap-3">
               {saveStatus}
               {mode === 'editor' && modeSwitch}
+              {downloadButton}
             </div>
           </PaneHeader>
           <textarea
@@ -92,6 +123,7 @@ function Editor({ initialMarkdown, ready }: EditorProps) {
             <div className="flex flex-wrap items-center justify-end gap-3">
               {mode === 'preview' && saveStatus}
               {modeSwitch}
+              {mode === 'preview' && downloadButton}
             </div>
           </PaneHeader>
           {/* 長いプレビューはこの欄の中でスクロールする。キーボードでもスクロールできるようフォーカス可能にする。
